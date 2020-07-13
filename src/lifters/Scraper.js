@@ -29,7 +29,7 @@ class Scraper{
 	* 						 [1] - the step that will make each iteration.
 	* @return {Array} - an array with the selected and filtered elements from the html.
 	*/
-    static getElementsFromHTML(cssSelector, html, filter, steps = [0, 1]){
+    static getElementsFromHTML({cssSelector, html, filter, steps = [0, 1]}){
         let elements = $(cssSelector, html),
             elementsFiltered = [];
 

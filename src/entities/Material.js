@@ -1,6 +1,8 @@
+const Clave = require('../entities/Clave');
+
 class Material{
-    constructor(subjectID, apunte, actividades){
-        this.subjectID = subjectID;
+    constructor(clave, apunte, actividades){
+        this.clave = new Clave(clave);
         this.apunteURL = apunte;
         this.actividadesURL = actividades;
     }

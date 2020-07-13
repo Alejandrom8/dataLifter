@@ -1,6 +1,7 @@
 const $ = require('cheerio'),
 	  Material = require('../entities/Material'),
-	  Scraper = require('./Scraper');
+	  Scraper = require('./Scraper'),
+	  { insertionSort } = require('../normalizers/sorters');
 
 /*
 	Materiales - an object that gets the URL's of the 'apuntes' and 'actividades'
@@ -14,8 +15,9 @@ class MapMaterials{
 	constructor(semestreID, plan = '2016'){
 		//where we are going to get the data.
 		this.baseURL = "http://fcasua.contad.unam.mx/apuntes/interiores/";
-		this.semestreID =  semestreID;
 		this.plan = plan;
+		this.semestreID =  semestreID;
+		this.URL = `${this.baseURL}plan${this.plan}_${this.semestreID}.php`;
 	}
 
 	/**
@@ -25,10 +27,10 @@ class MapMaterials{
 	async getMateriales(){
 		let result = {success: false};
 		try{
-			const url = `${this.baseURL}plan${this.plan}_${this.semestreID}.php`;
-			const pageHTML = await Scraper.scrap(url, 'utf8');
+			const pageHTML = await Scraper.scrap(this.URL, 'utf8');
 			if(!pageHTML) throw "We couldn't get the content of the specified URL";
-			const materiales_asignaturas = this.processHTML(pageHTML);
+			let materiales_asignaturas = this.processHTML(pageHTML);
+			materiales_asignaturas =  insertionSort(materiales_asignaturas);
 
 			result.data = materiales_asignaturas;
 			result.success = true;
@@ -41,7 +43,7 @@ class MapMaterials{
 	/**
 	 * processHTML - proccess the recived html and return an array of Material objects.
 	 * @param {string} html - an html structrure in string type.
-	 * @return {[Material]} an array with the materials extracted of the HTML.
+	 * @return {[Material]} an array with the materials extracted from the HTML.
 	 */
 	processHTML(html){
 		//gettin the 'claves'. patron: center-left-center-center. [clave, nombre, apunte, actividades];
@@ -52,6 +54,7 @@ class MapMaterials{
 
 		let subjects_materials = this.getElementsFromHTML(selector, html);
 		subjects_materials = this.classifyMaterials(subjects_materials);
+		subjects_materials = this.checkSimilarSubjects(subjects_materials);
 
 		return subjects_materials;
 	}
@@ -95,11 +98,11 @@ class MapMaterials{
 		}
 
 		return elementsFiltered;
-    }
+	}
 
 	/**
 	 * 
-	 * @param {[Material]} subjects 
+	 * @param {Array} subjects 
 	 * @return {[Material]}
 	 */
 	classifyMaterials(subjects){
@@ -116,15 +119,45 @@ class MapMaterials{
 		}
 
 		return sorted;
+	}
+
+	checkSimilarSubjects(mt){
+        let checked = [];
+        const withoutModifications = mt.slice();
+        let generalRoundSubjectsChecked = [];
+        let final = [];
+  
+        for(let i = 0; i < mt.length; i++){
+          	let coincidences = withoutModifications.filter((sub, index) => {
+				if(withoutModifications[i].clave.number == sub.clave.number) checked.push(index);
+				return withoutModifications[i].clave.number == sub.clave.number;
+			});
+			
+			if(!(coincidences.length > 1) || generalRoundSubjectsChecked.some(s => s == withoutModifications[i].clave.number)){
+				checked = [];
+				continue;
+			}
+  
+			//ISSUE - habrá problemas cuando admimistración e informática tengan
+			//una matería en común pero contaduría no. en tal caso, quedaría así:
+			//1151a (administración) 1151c (informática)...
+			let additionalIndexes = ['a', 'c', 'i'];
+			let changedKeys = coincidences.map((c, index) => {
+				c.clave.letter = additionalIndexes[index];
+				return c;
+			});
+	
+			for(let indexCoincidences = 0; indexCoincidences < changedKeys.length; indexCoincidences++){
+				let index = checked[indexCoincidences];
+				final.push(changedKeys[indexCoincidences]);
+			}
+	
+			checked = [];
+			generalRoundSubjectsChecked.push(withoutModifications[i].clave);
+        }
+  
+        return mt;
     }
 }
 
-async function main(){
-	let materialsManager = new MapMaterials(5);
-	let materiales = await materialsManager.getMateriales();
-	console.log(materiales);
-}
-
-main();
-
-// module.exports = MapMaterials;
+module.exports = MapMaterials;

@@ -1,3 +1,5 @@
+const Clave = require('../entities/Clave');
+
 class Asignatura{
     /**
      *
@@ -7,7 +9,7 @@ class Asignatura{
      */
     constructor(nombre, clave, planDeTrabajoURL = '', apunteURL = '', actividadesURL = ''){
         this.nombre = nombre;
-        this.clave = clave;
+        this.clave = new Clave(clave);
         this.planDeTrabajoURL = planDeTrabajoURL;
         this.apunteURL = apunteURL;
         this.actividadesURL = actividadesURL;
