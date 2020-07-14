@@ -1,52 +1,30 @@
-const DataBase = require('../DataBase');
-const MapSemester = require('../getData/MapSemester');
-const config = require('../../config');
-
+const DataBase = require('../DataBase'),
+	  config = require('../../config');
 
 class MigrateSemester{
-	constructor(semesterID){
-		this.semesterID = semesterID;
+	constructor(semester){
+		this.semester = semester;
 	}
 
-	async makeMigration(){
-		try{
-			let semester = await this.generateSemester();
-			await this.uploadDataBase(semester);
-		}catch(err){
-			console.log(err);
-		}
-	}
-
-	async generateSemester(){
-		let semesterManager = new MapSemester(this.semesterID);
-		let semester = await semesterManager.createSemester();
-		if(!semester.success) throw semester.errors;
-		return semester.data;
-	}
-
-	async uploadDataBase(semester){
-		let client;
+	async uploadDataBase(){
+		let client, result = {success: false};
 
 		try{
 			client = await DataBase.getClient();
 			let db = client.db(config.database.mongodb.db);
 			let collection = db.collection('semester');
-			let insert = await collection.insertOne(semester);
+			let insert = await collection.insertOne(this.semester);
 			if(!insert.result.ok) throw "No se ha logrado registrar el semestre";
-			console.log(`Semestre ${semester.numero} registrado exitosamente.`);
+			result.data = insert;
+			result.success = true;
 		}catch(err){
-			console.log(`Semestre ${semester.numero} no se ha registrado correctamente.`);
 			console.log(err);
+			result.errors = err;
 		}finally{
 			client.close();
+			return result;
 		}
 	}
 }
 
-async function main(){
-	let migration = new MigrateSemester(2);
-	await migration.makeMigration();
-	console.log('Fin...');
-}
-
-main();
+module.exports = MigrateSemester;

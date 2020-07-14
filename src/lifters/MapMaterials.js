@@ -72,29 +72,54 @@ class MapMaterials{
 			if(typeof htmlElements[i] == 'undefined') continue;
 
 			let element = htmlElements[i].children[0];
+			//if the element is a colspan of two, skip two elements.
+			if('data' in element){
+				if(element.data === 'Consultar plan de trabajo' || element.data === 'Consulta el plan de trabajo'){
+					elementsFiltered.push(element.data);
+					elementsFiltered.push(element.data);
+					linkCounter = 0;
+					continue;
+				}
+			}
 			
-			if('children' in element){
-				if('attribs' in element.children[0]){
-					if('alt' in element.children[0].attribs){
-						if(element.children[0].attribs.alt == 'Video Clase'){
-							continue;
-						}
-					}	
+			if('attribs' in htmlElements[i] && 'colspan' in htmlElements[i].attribs){
+				if(htmlElements[i].attribs.colspan == '2'){
+					elementsFiltered.push(element.data);
+					elementsFiltered.push(element.data);
+					linkCounter = 0;
+					continue;
+				}
+			}
+			
+			if('children' in element){ //if the element is a Video clase, skiped
+				if(element.children.length > 0){
+					if('attribs' in element.children[0]){
+						if('alt' in element.children[0].attribs){
+							if(element.children[0].attribs.alt == 'Video Clase'){
+								continue;
+							}
+						}	
+					}
 				}
 			}
 
-			if(linkCounter >= 2){
-				if(element.name != 'a'){
+			if(linkCounter >= 2){//apply this for elements in count 23 67 1011
+				//here are just the links 
+				if(element.name != 'a'){ //if the element is not the expected (a)
 					elementsFiltered.push(null);
 					continue;
 				}
+
 				element = this.baseURL + element.attribs.href;
 			}else{
+				if(element.name == 'p'){ //if element has p children even text
+					element = element.children[0];
+				}
 				element = element.data;
 			}
 
 			elementsFiltered.push(element);
-			linkCounter = linkCounter == 3 ? 0 : linkCounter+1;
+			linkCounter = linkCounter == 3 ? 0 : linkCounter+1; //to determine when a block of 4 is done
 		}
 
 		return elementsFiltered;
@@ -128,12 +153,16 @@ class MapMaterials{
         let final = [];
   
         for(let i = 0; i < mt.length; i++){
+			let conciderit = false;
+
+			//searching in all the array the keys that are repited
           	let coincidences = withoutModifications.filter((sub, index) => {
 				if(withoutModifications[i].clave.number == sub.clave.number) checked.push(index);
 				return withoutModifications[i].clave.number == sub.clave.number;
 			});
 			
-			if(!(coincidences.length > 1) || generalRoundSubjectsChecked.some(s => s == withoutModifications[i].clave.number)){
+			if(coincidences.length < 1 || 
+				generalRoundSubjectsChecked.indexOf(withoutModifications[i].clave.number)){
 				checked = [];
 				continue;
 			}

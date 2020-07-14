@@ -27,15 +27,18 @@ class Joiner{
         //en mt se genera otra deacuerdo al orden en el que se leen las materias,
         //lo que hace que no matche en ningun elemento.
         let apuntes = [], actividades = [];
-        for(let i = 0; i < mt.length; i++){
-            if(typeof key.letter == 'string'){
+        
+        if(typeof key.letter == 'string' && key.conciderLetter){
+            for(let i = 0; i < mt.length; i++){
                 if(mt[i].clave.number == key.number && 
                     mt[i].clave.letter == key.letter){
                     apuntes.push(mt[i].apunteURL);
                     actividades.push(mt[i].actividadesURL);
                     break;
                 }
-            }else{
+            }
+        }else{
+            for(let i = 0; i < mt.length; i++){
                 if(mt[i].clave.number == key.number){
                     apuntes.push(mt[i].apunteURL);
                     actividades.push(mt[i].actividadesURL);

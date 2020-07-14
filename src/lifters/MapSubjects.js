@@ -76,6 +76,7 @@ class MapSubjects{
       }
 
       let asignaturas = this.classifySubjects(names, keys, urls);
+      asignaturas = this.mapImportance(asignaturas);
 
       return asignaturas;
     }
@@ -92,7 +93,7 @@ class MapSubjects{
 
       for(let subjectIndex = 0; subjectIndex < names.length; subjectIndex++){
           let subject = new Asignatura(
-              names[subjectIndex],
+              names[subjectIndex ],
               (keys[subjectIndex].replace(/(^\s*(?!.+)\n+)|(\n+\s+(?!.+)$)/g, "")).trim(),
               pt_urls[subjectIndex]
           );
@@ -100,6 +101,18 @@ class MapSubjects{
           subjects.push(subject);
       }
 
+      return subjects;
+    }
+
+    mapImportance(subjects){
+      for(let i = 0; i < subjects.length; i++){
+        let current = subjects[i];
+        if(typeof current.clave.letter != 'string') continue;
+        let coincidences = subjects.filter((sub, index) => {
+          return current.clave.number == sub.clave.number;
+        });
+        if(coincidences.length > 1) subjects[i].clave.conciderLetter = true;
+      }
       return subjects;
     }
 }

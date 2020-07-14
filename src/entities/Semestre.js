@@ -1,12 +1,12 @@
 class Semestre{
     /**
      * 
-     * @param {Number} numero - numero de semestre
-     * @param {[Asignatura]} asignaturas - lista de asignaturas pertenecientes a este semestre
+     * @param {number} semesterID - numero de semestre
+     * @param {[Asignatura]} subjects - lista de asignaturas pertenecientes a este semestre
      */
-    constructor(numero, asignaturas = []){
-        this.numero = numero;
-        this.asignaturas = asignaturas;
+    constructor(semesterID, subjects = []){
+        this.semesterID = semesterID;
+        this.subjects = subjects;
     }
 
     /**
@@ -14,7 +14,7 @@ class Semestre{
      * @param {Asignatura} subject
      */
     addSubject(subject){
-        this.asignaturas.push(subject);
+        this.subjects.push(subject);
     }
 }
 

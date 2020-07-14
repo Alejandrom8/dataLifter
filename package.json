@@ -4,6 +4,7 @@
   "description": "A lifter for the data from the FCA SUA website.",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "jest"
   },
   "author": "Alejandro Gómez García <alejandro.originx@gmail.com>",
