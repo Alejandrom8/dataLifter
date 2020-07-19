@@ -10,7 +10,7 @@ class Scraper{
 	*	@param {string} encoding - the encoding used to decode the returned content.
 	*	@return {string} the html of the consulted url.
 	*/
-	static async scrap(URL, encoding){
+	static async scrap(URL, encoding = 'utf-8'){
 		return await new Promise((resolve, reject) => {
 			let config = {uri: URL, encoding: encoding};
 			rp(config)

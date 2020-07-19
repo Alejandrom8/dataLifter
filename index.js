@@ -8,7 +8,8 @@ async function main(){
     console.log('Generating the object for semester ' + semesterID + '...\n');
     let result = await semester_manager.createSemester();
     if(!result.success) console.log(result.errors);
-    let migration_manager = new MigrateSemester(result.data);
+    let semester = result.data;
+    let migration_manager = new MigrateSemester(semester);
     console.log('Making migration...\n');
     let migration_result = await migration_manager.uploadDataBase();
     if(!migration_result.success) console.log(migration_result.errors);

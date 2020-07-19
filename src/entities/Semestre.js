@@ -16,6 +16,14 @@ class Semestre{
     addSubject(subject){
         this.subjects.push(subject);
     }
+
+    getPdfsFromSubjects(){
+        if(this.subjects.length == 0) return [];
+        let links = this.subjects.map(sub => {
+            return sub.planDeTrabajoURL;
+        });
+        return links;
+    }
 }
 
 module.exports = Semestre;
