@@ -9,6 +9,7 @@ class MapSubjects{
     constructor(semesterID){
         this.semesterID = semesterID;
         this.URL = "http://fcaenlinea1.unam.mx/planes_trabajo/grupos.php?sem=";
+        this.subjectKeys = [];
     }
 
     /**
@@ -93,11 +94,13 @@ class MapSubjects{
 
       for(let subjectIndex = 0; subjectIndex < names.length; subjectIndex++){
           let subject = new Asignatura(
+              this.semesterID,
               names[subjectIndex ],
               (keys[subjectIndex].replace(/(^\s*(?!.+)\n+)|(\n+\s+(?!.+)$)/g, "")).trim(),
               pt_urls[subjectIndex]
           );
 
+          this.subjectKeys.push(subject.key);
           subjects.push(subject);
       }
 

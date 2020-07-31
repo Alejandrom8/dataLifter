@@ -18,6 +18,13 @@ class DataBase{
         }
         return client;
     }
+
+    static async getCollection(name){
+        let client = await DataBase.getClient();
+        let db = client.db(config.database.mongodb.db);
+        let collection = db.collection(name);
+        return [collection, client];
+    }
 }
 
 module.exports = DataBase;
