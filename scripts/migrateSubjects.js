@@ -1,5 +1,5 @@
-const SubjectsCreator = require('./src/creators/Subjects.creator');
-const MigrateSubjects = require('./src/migrations/MigrateSubjects');
+const SubjectsCreator = require('../src/creators/Subjects.creator');
+const MigrateSubjects = require('../src/migrations/MigrateSubjects');
 
 const semester = process.env.SEMESTER || 1;
 
