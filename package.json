@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "test": "jest",
-    "migrateSubjects": "node /scripts/migrateSubjects.js"
+    "migrateSubjects": "node scripts/migrateSubjects.js",
+    "migrateActivities": "node scripts/migrateActivities.js"
   },
   "author": "Alejandro Gómez García <alejandro.originx@gmail.com>",
   "license": "ISC",
