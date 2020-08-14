@@ -1,25 +1,28 @@
 'use strict';
 
-const Asignatura = require('../entities/Asignatura'),
+const Subject = require('../entities/Subject'),
       Scraper = require('./Scraper'),
+      config = require('../../config'),
       { insertionSort } = require('../normalizers/sorters');
 
 
-class MapSubjects{
-    constructor(semesterID){
+class MapSubjects {
+    constructor(semesterID) {
         this.semesterID = semesterID;
-        this.URL = "http://fcaenlinea1.unam.mx/planes_trabajo/grupos.php?sem=";
+        this.baseURL = config.scraping.baseURLForSubjects;
         this.subjectKeys = [];
     }
 
     /**
-     * @return {Object} - {success, errors?, data?}
+     * @returns {Promise} - {success, errors?, data?}
      */
-    async getSubjects(){
+    async getSubjects() {
         let result = {success: false};
 
-        try{
-          const url = this.URL + this.semesterID;
+        const url = this.baseURL + this.semesterID;
+        console.log(`Getting subjects for semester: ${this.semesterID}. From: ${url}`);
+
+        try {
           const pageContent = await Scraper.scrap(url, 'latin1');
           let asignaturas = this.processHTML(pageContent);
           if(!asignaturas) throw "Hubo un error al completar las asignaturas";
@@ -27,7 +30,7 @@ class MapSubjects{
 
           result.data = asignaturas;
           result.success = true;
-        }catch(err){
+        } catch(err) {
           result.errors = err;
         }
 
@@ -37,24 +40,27 @@ class MapSubjects{
     /**
      * If the font change, this function should be addapted to extract the specified
      * data from the new page.
-     * @param {string} html 
-     * @return {[Asignatura]}
+     * @param {String} html - the html content from where will be extracted the
+     * subjects.
+     * @return {Subject[]} the extracted subjects.
      */
-    processHTML(html){
+    processHTML(html) {
       const filter = element => element.children[0].data;
 
       const subjectElementsClassifier = {
         cssSelector: 'td[width="87%"].asignatura > strong',
         html: html,
-        filter: filter,
-        steps: [0, 1]
+        filter: filter
       }
 
-      const claveElementsClassifier = {
+      const keyElementsClassifier = {
         cssSelector: 'td[width=44].grupo > div',
         html: html,
         filter: filter,
-        steps: [1, 2]
+        steps: {
+          init: 1,
+          size: 2
+        }
       }
 
       const urlsElementsClassifier = {
@@ -62,59 +68,69 @@ class MapSubjects{
         html: html,
         filter: element => {
           let generic_link = element.children[1].attribs.href;
-          let url = `http://fcaenlinea1.unam.mx/planes_trabajo/${generic_link}`;
+          let url = `${config.scraping.baseURLForWorkPlans}${generic_link}`;
           return url
-        },
-        steps: [0, 1]
+        }
       }
 
-      let names = Scraper.getElementsFromHTML(subjectElementsClassifier),
-          keys = Scraper.getElementsFromHTML(claveElementsClassifier),
+      let subjectNames = Scraper.getElementsFromHTML(subjectElementsClassifier),
+          keys = Scraper.getElementsFromHTML(keyElementsClassifier),
           urls = Scraper.getElementsFromHTML(urlsElementsClassifier);
 
-      if(names.length != keys.length || names.length != urls.length){
-          throw "Hubo un error al intentar procesar el html solicitado";
+      if(subjectNames.length != keys.length || subjectNames.length != urls.length) {
+          throw "There was a problem while trying to process the specified html";
       }
 
-      let asignaturas = this.classifySubjects(names, keys, urls);
+      let asignaturas = this.classifySubjects(subjectNames, keys, urls);
       asignaturas = this.mapImportance(asignaturas);
 
       return asignaturas;
     }
 
     /**
-     * Groups the extracted info from proccessHTML into Asignatura objects.
-     * @param {[string]} names 
-     * @param {[string]} keys 
-     * @param {[string]} pt_urls 
-     * @return {[Asignatura]}
+     * Groups the extracted info from proccessHTML into Subject objects.
+     * @param {String[]} names - the names of the subjects
+     * @param {String[]} keys - the real key of the subject (that obe generated
+     * by the university).
+     * @param {String[]} pt_urls - an array of URL for the work plans for each 
+     * subject.
+     * @returns {Subject[]} the grouped data into Subject objects.
      */
-    classifySubjects(names, keys, pt_urls){
+    classifySubjects(names, keys, pt_urls) {
       let subjects = [];
 
-      for(let subjectIndex = 0; subjectIndex < names.length; subjectIndex++){
-          let subject = new Asignatura(
+      for(let subjectIndex = 0; subjectIndex < names.length; subjectIndex++) {
+          let subject = new Subject(
               this.semesterID,
-              names[subjectIndex ],
-              (keys[subjectIndex].replace(/(^\s*(?!.+)\n+)|(\n+\s+(?!.+)$)/g, "")).trim(),
+              names[subjectIndex],
+              (keys[subjectIndex]
+                .replace(/(^\s*(?!.+)\n+)|(\n+\s+(?!.+)$)/g, ""))
+                .trim(),
               pt_urls[subjectIndex]
           );
 
-          this.subjectKeys.push(subject.key);
           subjects.push(subject);
+          this.subjectKeys.push(subject.key);
       }
 
       return subjects;
     }
 
-    mapImportance(subjects){
-      for(let i = 0; i < subjects.length; i++){
+    /**
+     * specify if the letter property of the Key object of each Subject should
+     * be considered to group the subject. Therefore, sets to true or false the
+     * "conciderLetter" property of each "key" property of each Subject.
+     * @param {Subject[]} subjects - the array of Subject objects that will be
+     * mapped.
+     */
+    mapImportance(subjects) {
+      for(let i = 0; i < subjects.length; i++) {
         let current = subjects[i];
-        if(typeof current.clave.letter != 'string') continue;
-        let coincidences = subjects.filter((sub, index) => {
-          return current.clave.number == sub.clave.number;
-        });
-        if(coincidences.length > 1) subjects[i].clave.conciderLetter = true;
+        if(typeof current.key.letter != 'string') continue;
+        let coincidences = subjects.filter( sub => (
+          current.key.number == sub.key.number
+        ));
+        if(coincidences.length > 1) subjects[i].key.conciderLetter = true;
       }
       return subjects;
     }
