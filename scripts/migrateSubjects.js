@@ -1,9 +1,9 @@
-const SubjectsCreator = require('./src/creators/Subjects.creator');
-const MigrateSubjects = require('./src/migrations/MigrateSubjects');
+const SubjectsCreator = require('../src/creators/Subjects.creator');
+const MigrateSubjects = require('../src/migrations/MigrateSubjects');
 
 const semester = process.env.SEMESTER || 1;
 
-async function generateSubjects(semesterID){
+async function generateSubjects(semesterID) {
     let subjects_manager = new SubjectsCreator(semesterID);
     let subjects = await subjects_manager.createSubjects();
     if(!subjects){
@@ -13,13 +13,13 @@ async function generateSubjects(semesterID){
     return subjects;
 }
 
-async function migrateSubjecs(subjects){
+async function migrateSubjecs(subjects) {
     let migration_manager = new MigrateSubjects(subjects);
     let result = await migration_manager.uploadSubjects();
     return result.success;
 }
 
-(async function main(){
+(async function main() {
     let subjects = await generateSubjects(semester);
     let migration_result = await migrateSubjecs(subjects);
     migration_result ? 

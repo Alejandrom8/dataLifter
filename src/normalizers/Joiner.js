@@ -1,47 +1,72 @@
-class Joiner{
-    constructor(pt, mt){
-        this.pt = pt;
-        this.mt = mt;
+const Subject = require('../entities/Subject');
+
+/**
+ * this class has the only propouse to merge an Array of Subjects and another of
+ * Materials.
+ * @class
+ */
+class Joiner {
+
+    /**
+     * 
+     * @param {Subject[]} subjectsList 
+     * @param {Material[]} materialsList 
+     */
+    constructor(subjectsList, materialsList) {
+        this.subjectsList = subjectsList;
+        this.materialsList = materialsList;
     }
 
-    getSubjects(){
-        let joined_data = this.joinThem(this.pt, this.mt);
-        return joined_data;
-    }
+    /**
+     * Join a list of subject and material objects by it's key number.
+     * @returns {Subject[]}
+     */
+    joinThem() {
+        let {subjectsList, materialsList} = this;
 
-    joinThem(){
-        let {pt, mt} = this;
+        for(let i = 0; i < subjectsList.length; i++) {
+            let current = subjectsList[i];
+            let {key} = current;
+            let [apuntes, actividades] = this.searchCoincidences(
+                key,
+                materialsList
+            );
 
-        for(let i = 0; i < pt.length; i++){
-            let current = pt[i];
-            let key = current.clave;
-            let [apuntes, actividades] = this.searchCoincidences(key, mt);
-            pt[i].apunteURL = apuntes.length == 1 ? apuntes[0] : apuntes;
-            pt[i].actividadesURL = actividades.length == 1 ? actividades[0] : actividades;
+            subjectsList[i].setMaterials(
+                apuntes.length === 1 ? apuntes[0] : apuntes,
+                actividades.length === 1 ? actividades[0] : actividades
+            );
         }
-        return pt;
+
+        return subjectsList;
     }
 
-    searchCoincidences(key, mt){
+    /**
+     *
+     * @param {object} key
+     * @param {Material[]} materialsList
+     * @returns {[][]}
+     */
+    searchCoincidences(key, materialsList) {
         //ISSUE - cuando en pt se especifica una letra fuera de orden [a, c, i], 
-        //en mt se genera otra deacuerdo al orden en el que se leen las materias,
-        //lo que hace que no matche en ningun elemento.
+        //en materialsList se genera otra deacuerdo al orden en el que se leen 
+        //las materias, lo que hace que no matche en ningun elemento.
         let apuntes = [], actividades = [];
         
-        if(typeof key.letter == 'string' && key.conciderLetter){
-            for(let i = 0; i < mt.length; i++){
-                if(mt[i].clave.number == key.number && 
-                    mt[i].clave.letter == key.letter){
-                    apuntes.push(mt[i].apunteURL);
-                    actividades.push(mt[i].actividadesURL);
+        if(typeof key.letter == 'string' && key.conciderLetter) {
+            for(let i = 0; i < materialsList.length; i++) {
+                if(materialsList[i].key.number === key.number &&
+                    materialsList[i].key.letter === key.letter) {
+                    apuntes.push(materialsList[i].apunteURL);
+                    actividades.push(materialsList[i].actividadesURL);
                     break;
                 }
             }
-        }else{
-            for(let i = 0; i < mt.length; i++){
-                if(mt[i].clave.number == key.number){
-                    apuntes.push(mt[i].apunteURL);
-                    actividades.push(mt[i].actividadesURL);
+        } else {
+            for(let i = 0; i < materialsList.length; i++){
+                if(materialsList[i].key.number === key.number) {
+                    apuntes.push(materialsList[i].apunteURL);
+                    actividades.push(materialsList[i].actividadesURL);
                 }
             }
         }

@@ -9,7 +9,7 @@ describe("Getting materials from the FCA website", () => {
     
     it('get the hole elements from the web page', async () => {
         let materials_manager = new MapMaterials(semester);
-        let result = await materials_manager.getMateriales();
+        let result = await materials_manager.getMaterials();
 
         expect(result.success).toBe(true);
         expect(result.data).toBeTruthy();

@@ -1,70 +1,73 @@
 const $ = require('cheerio'),
 	  Material = require('../entities/Material'),
 	  Scraper = require('./Scraper'),
+	  config = require('../../config'),
 	  { insertionSort } = require('../normalizers/sorters');
 
-/*
-	Materiales - an object that gets the URL's of the 'apuntes' and 'actividades'
-	of each subject of the specified semester.
+/**
+ * 	MapMaterials - an object that gets the URL's of the 'apuntes' and 
+ * 'acdtividades' of each subject of the specified semester.
+ * @class
 */
-class MapMaterials{
+class MapMaterials {
 	/**
-	*	@param {number} semestreID - the number of the semester.
-	*	@param {string} plan - the year of the study plan.
+	*	@param {number} semesterID - the number of the semester.
+	*	@param {string} [plan = '2016'] - the year of the study plan.
 	*/
-	constructor(semestreID, plan = '2016'){
+	constructor(semesterID, plan = '2016') {
 		//where we are going to get the data.
-		this.baseURL = "http://fcasua.contad.unam.mx/apuntes/interiores/";
+		this.baseURL = config.scraping.baseURLForMaterials;
 		this.plan = plan;
-		this.semestreID =  semestreID;
-		this.URL = `${this.baseURL}plan${this.plan}_${this.semestreID}.php`;
+		this.semesterID = semesterID;
+		this.URL = `${this.baseURL}plan${this.plan}_${this.semesterID}.php`;
 	}
 
 	/**
 	*	getMateriales - returns an array with the subjects of the specified semester.
-	*	@return {Array} - an array of Asignatura objects.
+	*	@returns {Promise} - an array of Material objects.
 	*/
-	async getMateriales(){
+	async getMaterials() {
 		let result = {success: false};
-		try{
-			const pageHTML = await Scraper.scrap(this.URL, 'utf8');
-			if(!pageHTML) throw "We couldn't get the content of the specified URL";
-			let materiales_asignaturas = this.processHTML(pageHTML);
-			materiales_asignaturas =  insertionSort(materiales_asignaturas);
-
-			result.data = materiales_asignaturas;
+		try {
+			const pageHTML = await Scraper.scrap(this.URL);
+			result.data = this.processHTML(pageHTML);
 			result.success = true;
-		}catch(err){
+		} catch(err) {
 			result.errors = err;
 		}
 		return result;
 	}
 
 	/**
-	 * processHTML - proccess the recived html and return an array of Material objects.
-	 * @param {string} html - an html structrure in string type.
-	 * @return {[Material]} an array with the materials extracted from the HTML.
+	 * processHTML - process the recived html and returns an array of Material
+	 * objects.
+	 * @param {string} html - an html structure in string type.
+	 * @returns {Material[]} an array with the materials extracted from the HTML.
 	 */
-	processHTML(html){
+	processHTML(html) {
 		//gettin the 'claves'. patron: center-left-center-center. [clave, nombre, apunte, actividades];
 		const generalSelector = `table.tablaamarilla > tbody tr >`,
 			  type_1 = `${generalSelector} td.tablaamarilla[valign="middle"][bgcolor="#E6E6E6"]`,
 			  type_2 = `${generalSelector} td.estilos[valign="middle"][bgcolor="#E6E6E6"]`,
 			  selector = `${type_1}, ${type_2}`;
 
-		let subjects_materials = this.getElementsFromHTML(selector, html);
-		subjects_materials = this.classifyMaterials(subjects_materials);
-		subjects_materials = this.checkSimilarSubjects(subjects_materials);
+		let subjectMaterials = this.getElementsFromHTML(selector, html);
+		subjectMaterials = this.groupMaterials(subjectMaterials);
+		subjectMaterials = this.checkSimilarSubjects(subjectMaterials);
+		subjectMaterials = insertionSort(subjectMaterials);
 
-		return subjects_materials;
+		return subjectMaterials;
 	}
 
 	/**
 	 * 
-	 * @param {string} cssSelector 
-	 * @param {string} html 
+	 * @param {string} cssSelector - the css selector wich will be used to
+	 * filter the html content.
+	 * @param {string} html - the html content.
+	 * @returns {Object[]} the filtered elements of the html based on certain
+	 * filters.
 	 */
-	getElementsFromHTML(cssSelector, html){
+	getElementsFromHTML(cssSelector, html) {
 		const htmlElements = $(cssSelector, html);
 		let elementsFiltered = [], linkCounter = 0;
 
@@ -72,9 +75,14 @@ class MapMaterials{
 			if(typeof htmlElements[i] == 'undefined') continue;
 
 			let element = htmlElements[i].children[0];
-			//if the element is a colspan of two, skip two elements.
-			if('data' in element){
-				if(element.data === 'Consultar plan de trabajo' || element.data === 'Consulta el plan de trabajo'){
+
+			/*if the element is a colspan of two and have the indicated text,
+			skip two elements. and continue to the next element.*/
+			if('data' in element) {
+				if(
+					element.data === 'Consultar plan de trabajo' || 
+					element.data === 'Consulta el plan de trabajo'
+				) {
 					elementsFiltered.push(element.data);
 					elementsFiltered.push(element.data);
 					linkCounter = 0;
@@ -82,8 +90,11 @@ class MapMaterials{
 				}
 			}
 			
-			if('attribs' in htmlElements[i] && 'colspan' in htmlElements[i].attribs){
-				if(htmlElements[i].attribs.colspan == '2'){
+			if(
+				'attribs' in htmlElements[i] &&
+				'colspan' in htmlElements[i].attribs
+			) {
+				if(htmlElements[i].attribs.colspan === '2') {
 					elementsFiltered.push(element.data);
 					elementsFiltered.push(element.data);
 					linkCounter = 0;
@@ -91,35 +102,36 @@ class MapMaterials{
 				}
 			}
 			
-			if('children' in element){ //if the element is a Video clase, skiped
-				if(element.children.length > 0){
-					if('attribs' in element.children[0]){
-						if('alt' in element.children[0].attribs){
-							if(element.children[0].attribs.alt == 'Video Clase'){
+			if('children' in element) { //if the element is a Video clase, skip it
+				if(element.children.length > 0) {
+					if('attribs' in element.children[0]) {
+						if('alt' in element.children[0].attribs) {
+							if(element.children[0].attribs.alt === 'Video Clase') {
 								continue;
 							}
-						}	
+						}
 					}
 				}
 			}
 
-			if(linkCounter >= 2){//apply this for elements in count 23 67 1011
+			if(linkCounter >= 2) {//apply this for elements in count 23 67 1011
 				//here are just the links 
-				if(element.name != 'a'){ //if the element is not the expected (a)
+				if(element.name !== 'a') { //if the element is not the expected (a)
 					elementsFiltered.push(null);
 					continue;
 				}
 
 				element = this.baseURL + element.attribs.href;
-			}else{
-				if(element.name == 'p'){ //if element has p children even text
+			} else {
+				if(element.name === 'p') { //if element has p children even text
 					element = element.children[0];
 				}
 				element = element.data;
 			}
 
 			elementsFiltered.push(element);
-			linkCounter = linkCounter == 3 ? 0 : linkCounter+1; //to determine when a block of 4 is done
+			//to determine when a block of 4 is done
+			linkCounter = linkCounter === 3 ? 0 : linkCounter+1;
 		}
 
 		return elementsFiltered;
@@ -128,12 +140,12 @@ class MapMaterials{
 	/**
 	 * 
 	 * @param {Array} subjects 
-	 * @return {[Material]}
+	 * @returns {Material[]}
 	 */
-	classifyMaterials(subjects){
+	groupMaterials(subjects) {
 		let sorted = [], clave, apunteURL, actividadesURL, material;
 
-		for(let i = 0; i < subjects.length; i += 4){
+		for(let i = 0; i < subjects.length; i += 4) {
 			clave = typeof subjects[i] == 'undefined' ? subjects[i+1] : subjects[i];
 			clave = (clave.replace(/(^\s*(?!.+)\n+)|(\n+\s+(?!.+)$)/g, "")).trim();
 			apunteURL = subjects[i+2];
@@ -146,23 +158,29 @@ class MapMaterials{
 		return sorted;
 	}
 
-	checkSimilarSubjects(mt){
+	checkSimilarSubjects(mt) {
         let checked = [];
         const withoutModifications = mt.slice();
         let generalRoundSubjectsChecked = [];
         let final = [];
-  
-        for(let i = 0; i < mt.length; i++){
-			let conciderit = false;
+		let additionalIndexes = ['a', 'c', 'i'];
 
-			//searching in all the array the keys that are repited
-          	let coincidences = withoutModifications.filter((sub, index) => {
-				if(withoutModifications[i].clave.number == sub.clave.number) checked.push(index);
-				return withoutModifications[i].clave.number == sub.clave.number;
-			});
-			
-			if(coincidences.length < 1 || 
-				generalRoundSubjectsChecked.indexOf(withoutModifications[i].clave.number)){
+		const getCoincidences = i => withoutModifications.filter((sub, index) => {
+				  if(withoutModifications[i].key.number === sub.key.number) checked.push(index);
+				  return withoutModifications[i].key.number === sub.key.number;
+		      }),
+			  subjectIsChecked = (id) => generalRoundSubjectsChecked.indexOf(id),
+			  tagCoincidences = coincidences => (
+				  coincidences.map( (c, index) => {
+					  c.key.letter = additionalIndexes[index];
+					  return c;
+				  })
+			  );
+  
+        for(let i = 0; i < mt.length; i++) {
+			//searching in all the array the keys that are repeated
+          	let coincidences = getCoincidences(i);
+			if(coincidences.length < 1 || subjectIsChecked(withoutModifications[i].key.number)) {
 				checked = [];
 				continue;
 			}
@@ -170,19 +188,11 @@ class MapMaterials{
 			//ISSUE - habrá problemas cuando admimistración e informática tengan
 			//una matería en común pero contaduría no. en tal caso, quedaría así:
 			//1151a (administración) 1151c (informática)...
-			let additionalIndexes = ['a', 'c', 'i'];
-			let changedKeys = coincidences.map((c, index) => {
-				c.clave.letter = additionalIndexes[index];
-				return c;
-			});
-	
-			for(let indexCoincidences = 0; indexCoincidences < changedKeys.length; indexCoincidences++){
-				let index = checked[indexCoincidences];
-				final.push(changedKeys[indexCoincidences]);
-			}
-	
+			let changedKeys = tagCoincidences(coincidences);
+			changedKeys.forEach(ck => final.push(ck));
+
 			checked = [];
-			generalRoundSubjectsChecked.push(withoutModifications[i].clave);
+			generalRoundSubjectsChecked.push(withoutModifications[i].key);
         }
   
         return mt;
