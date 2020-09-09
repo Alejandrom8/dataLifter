@@ -4,14 +4,12 @@ const SubjectsCreator = require('../src/creators/Subjects.creator'),
       MigrateModules = require('../src/migrations/MigrateModules'),
       MigrateActivities = require('../src/migrations/MigrateActivities');
 
-let SEMESTER = process.env.SEMESTER;
+let SEMESTER = parseInt(process.env.SEMESTER);
 
 if(!SEMESTER) {
-   console.log("SEMESTER option is not especified")
+   console.log("SEMESTER option is not specified")
    return
 }
-
-SEMESTER = parseInt(SEMESTER);
 
 (async function main() {
     /**
@@ -21,67 +19,65 @@ SEMESTER = parseInt(SEMESTER);
      * 2. generate modules and activities
      * 3. migrate subjects
      * 4. migrate modules and activities
-     */   
+     */
 
-     const start = Date.now();// starting time
+      const start = Date.now();// starting time
 
-     //getting subjects.
-     let subjectsCreatorManager = new SubjectsCreator(SEMESTER);
-     let subjectsToMigrate = await subjectsCreatorManager.createSubjects();
-      console.log(`Created ${subjectsToMigrate.length} subjects`);
-     //getting modules and activities for each subject.
+      //getting subjects.
+      let subjectsCreatorManager = new SubjectsCreator(SEMESTER);
+      let pureSubjects = await subjectsCreatorManager.createSubjects();
+      console.log(`Created ${pureSubjects.length} subjects`);
 
-     let [
-         modulesToMigrate, 
+      //getting modules and activities for each subject.
+      let [
+         modulesToMigrate,
          activitiesToMigrate
-      ] = await createModulesAndActivities(subjectsToMigrate);
+      ] = await createModulesAndActivities(pureSubjects);
 
-     //migrating subjects
-     let SMM = new MigrateSubjects(subjectsToMigrate);
-     let subjectsMigrationResult = await SMM.migrate();
+      let migrators = [MigrateSubjects, MigrateModules, MigrateActivities];
+      let elementsToMigrate = [pureSubjects, modulesToMigrate, activitiesToMigrate];
+      let labels = ['subjects', 'modules', 'activities'];
 
-     if(!subjectsMigrationResult.success) {
-        console.log(subjectsMigrationResult.errors);
-        return
-     }
+      for(let i = 0; i < elementsToMigrate.length; i++) {
+          let ok = await migrateObjects(
+              migrators[i],
+              elementsToMigrate[i],
+              labels[i]
+          );
+          if(!ok) break;
+      }
 
-     console.log(`Migrated ${subjectsToMigrate.length} subjects`);
-
-     //migrating modules
-     let MMM = new MigrateModules(modulesToMigrate);
-     let modulesMigrationResult = await MMM.migrate();
-
-     if(!modulesMigrationResult.success) {
-        console.log(modulesMigrationResult.errors);
-        return
-     }
-
-     console.log(`Migrated ${modulesToMigrate.length} modules`);
-
-     //migrating activities
-     let AMM = new MigrateActivities(activitiesToMigrate);
-     let activitiesMigrationResult = await AMM.migrate();
-
-     if(!activitiesMigrationResult.success) {
-        console.log(activitiesMigrationResult.errors);
-        return
-     }
-
-     console.log(`Migrated ${activitiesToMigrate.length} activities`);
-
-     console.log(`Program finished in : ${Date.now() - start}ms`);
+      console.log(`Program finished in : ${Date.now() - start}ms`);
 })();
 
-async function createModulesAndActivities(subjects){
+async function migrateObjects(migrator, objects, label) {
+    let migrationManager = new migrator(objects);
+    let result = await migrationManager.migrate();
+
+    if(!result.success) {
+        console.log(result.errors);
+        return false;
+    }
+
+    console.log("Migrated " + objects.length + " " + label);
+    return true;
+}
+
+async function createModulesAndActivities(subjects) {
    let modulesToMigrate = [], activitiesToMigrate = [];
 
-   for(let subject of subjects){
+   for(let subject of subjects) {
+
+      //creating modules and activities
       let modulesCreatorManager = new ModulesCreator(subject);
       let result = await modulesCreatorManager.createModules();
-
-      console.log(`Created ${result.modules.length} modules and ${result.activities.length} activities for subject ${subject.key.key}`)
+      
       modulesToMigrate.push(...result.modules);
       activitiesToMigrate.push(...result.activities);
+
+      console.log(`subject ${subject.key.key}`)
+      console.log(`----Created ${result.modules.length} modules`)
+      console.log(`----Created ${result.activities.length} activities`)
    }
 
   return [modulesToMigrate, activitiesToMigrate];

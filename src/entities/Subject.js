@@ -2,23 +2,23 @@ const Key = require('./Key'),
       { genRandomKey } = require('../helpers/generators');
       
 /**
- * creates a new Subject.
+ * creates a new Subject instance.
  * @class
  */
 class Subject {
     /**
-     * @param {String} semesterID - the number of the semester to wich this
+     * @param {String} semesterID - the number of the semester to which this
      * subject belongs.
      * @param {String} name - name of the subject.
      * @param {String} key - the real key (that one given by the university)
      * that identifies this subject.
-     * @param {URL} [planDeTrabajoURL = ''] - URL direction for the "plan de 
+     * @param {String} [planDeTrabajoURL = ''] - URL direction for the "plan de 
      * trabajo" PDF document for this subject. This one will only exists for the 
      * SUA education mode.
-     * @param {URL} [apunteURL = ''] - URL directrion for the "apunte" PDF 
+     * @param {String} [apunteURL = ''] - URL direction for the "apunte" PDF
      * document of this subject. This one will only exists for the SUA education 
      * mode.
-     * @param {URL} [actividadesURL = ''] - URL direction for the "actividades" 
+     * @param {String} [actividadesURL = ''] - URL direction for the "actividades" 
      * PDF document of this subject. This one will only exists for the SUA 
      * education mode.
      */
@@ -31,16 +31,22 @@ class Subject {
         actividadesURL = ''
     ) {
         this.subjectID = genRandomKey();
-
         this.semesterID = semesterID;
-        this.name = name;
         this.key = new Key(key);
+        this.name = name;
         this.planDeTrabajoURL = planDeTrabajoURL;
         this.apunteURL = apunteURL;
         this.actividadesURL = actividadesURL;
     }
 
-    setMaterials(apunteURL, actividadesURL){
+    /**
+     * 
+     * @param {String} apunteURL - the URL of the apunte PDF for this subject 
+     * object.
+     * @param {String} actividadesURL - the URL for the actividades PDF for this
+     * subject object.
+     */
+    setMaterials(apunteURL, actividadesURL) {
         this.apunteURL = apunteURL;
         this.actividadesURL = actividadesURL;
     }

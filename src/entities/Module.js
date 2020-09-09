@@ -7,7 +7,7 @@ const { genRandomKey } = require('../helpers/generators');
 class Module {
     /**
      * 
-     * @param {String} subjectID - the university key of the subject to wich
+     * @param {String} subjectID - the university key of the subject to which
      * this module belongs.
      * @param {String} moduleTitle - the title for this module.
      * @param {Number} index - the index that sort each module.

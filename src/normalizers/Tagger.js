@@ -11,6 +11,10 @@ class Tagger {
         this.modules = modules;
     }
 
+    /**
+     *
+     * @returns {[][]}
+     */
     getSeparatedModulesAndActivities() {
         let taggedModules = [], taggedActivities = [];
 
@@ -31,15 +35,20 @@ class Tagger {
         return [taggedModules, taggedActivities];
     }
 
+    /**
+     * 
+     * @param {String} moduleID 
+     * @param {[]} activities 
+     */
     getSeparatedActivities(moduleID, activities) {
-        let taggedActivities = activities.map( (act, actIndex) => {
+        return activities.map( (act, actIndex) => {
             return new Activity(
                 moduleID,
                 act.text,
-                actIndex
+                actIndex,
+                act.actividad
             )
-        });        
-        return taggedActivities;
+        });
     }
 }
 

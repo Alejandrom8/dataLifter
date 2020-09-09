@@ -17,12 +17,14 @@ class Scraper {
 	*	@returns {Promise} the html of the consulted url.
 	*/
 	static async scrap(URL, encoding = 'utf8') {
-		return await new Promise((resolve, reject) => {
+		let result = await new Promise((resolve, reject) => {
 			let config = {uri: URL, encoding: encoding};
 			rp(config)
 				.then( html => resolve(html))
 				.catch( err => reject(err));
 		});
+		if(!result) throw 'can not get the content of the specified url';
+		return result;
     }
 
 	/**

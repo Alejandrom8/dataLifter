@@ -38,7 +38,7 @@ class MapSubjects {
     }
 
     /**
-     * If the font change, this function should be addapted to extract the specified
+     * If the font change, this function should be adapted to extract the specified
      * data from the new page.
      * @param {String} html - the html content from where will be extracted the
      * subjects.
@@ -67,9 +67,12 @@ class MapSubjects {
         cssSelector: 'td[width=51].nombre > span.grupo',
         html: html,
         filter: element => {
+            /*
           let generic_link = element.children[1].attribs.href;
-          let url = `${config.scraping.baseURLForWorkPlans}${generic_link}`;
-          return url
+            commented while the FCA website puts the links again
+             */
+          let url = `${config.scraping.baseURLForWorkPlans}${''}`;/*here should be generic_link*/
+          return url;
         }
       }
 
@@ -77,7 +80,7 @@ class MapSubjects {
           keys = Scraper.getElementsFromHTML(keyElementsClassifier),
           urls = Scraper.getElementsFromHTML(urlsElementsClassifier);
 
-      if(subjectNames.length != keys.length || subjectNames.length != urls.length) {
+      if(subjectNames.length !== keys.length || subjectNames.length !== urls.length) {
           throw "There was a problem while trying to process the specified html";
       }
 
@@ -88,7 +91,7 @@ class MapSubjects {
     }
 
     /**
-     * Groups the extracted info from proccessHTML into Subject objects.
+     * Groups the extracted info from processHTML into Subject objects.
      * @param {String[]} names - the names of the subjects
      * @param {String[]} keys - the real key of the subject (that obe generated
      * by the university).
@@ -119,7 +122,7 @@ class MapSubjects {
     /**
      * specify if the letter property of the Key object of each Subject should
      * be considered to group the subject. Therefore, sets to true or false the
-     * "conciderLetter" property of each "key" property of each Subject.
+     * "considerLetter" property of each "key" property of each Subject.
      * @param {Subject[]} subjects - the array of Subject objects that will be
      * mapped.
      */

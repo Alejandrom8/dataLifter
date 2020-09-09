@@ -4,10 +4,10 @@
  * from 0 to limit. Example: if limit = 20, the range is 0 to 20 and will return
  * a random number inside that range of numbers.
  */
-exports.genRandomNumber = limit => Math.floor(Math.random() * limit);
+const genRandomNumber = limit => Math.floor(Math.random() * limit);
 
 /**
- * genRandomKey
+ * genRandomKey - generates a random string with hexadecimal values.
  * @param {Number} [size = 6] - the size of the random key.
  */
 exports.genRandomKey = (size  = 6) => {
@@ -17,8 +17,8 @@ exports.genRandomKey = (size  = 6) => {
     let key = '', randomElementList, generated = 0;
 
     while(generated <= size) {
-        randomElementList = elements[exports.genRandomNumber(elements.length)];
-        key += randomElementList[exports.genRandomNumber(randomElementList.length)];
+        randomElementList = elements[genRandomNumber(elements.length)];
+        key += randomElementList[genRandomNumber(randomElementList.length)];
         generated++;
     }
 

@@ -6,9 +6,9 @@ class MapActivities {
 
     /**
      * 
-     * @param {String} semesterID - the number of the semester to wich this
+     * @param {number} semesterID - the number of the semester to which this
      * activities belongs.
-     * @param {String} subjectID - the university key of the subject to wich
+     * @param {String} subjectID - the university key of the subject to which
      * this activities belongs.
      * @param {String} pdfURL - where the data will be scrapped.
      */
@@ -134,7 +134,7 @@ class MapActivities {
             j++;
             analyzedLines++;
             currentLine = lines[j];
-            isNotDivider = this.getText(currentLine) != divider;
+            isNotDivider = this.getText(currentLine) !== divider;
         } while(isNotDivider && blank < 10 && j < lines.length);
 
         block.text = arrayToText(block.text);
@@ -159,7 +159,7 @@ class MapActivities {
      * @returns {String} the first element that matches with the matcher RegExp
      */
     getElement(line, matcher) {
-        if(!line) return;
+        if(!line) return '';
         let result = line.match(matcher);
         return result ? result[0] : result;
     }
@@ -167,17 +167,16 @@ class MapActivities {
     /**
      * 
      * @param {String} line 
-     * @param {Boolean} true if the line is '' or null or undefined or does not
+     * @returns {Boolean} true if the line is '' or null or undefined or does not
      * contain anything but spaces.
      */
     isEmpty(line) {
         return !line ||
-                line == '' ||
-                line.replace(/\s+/g, '').length == 0 ? true : false;       
+                line.replace(/\s+/g, '').length === 0;
     }
 
     /**
-     * 
+     * creates a new string with just letters.
      * @param {String} line
      * @returns {String} a line with just alfabetic characters (a-zA-Z)
      */
@@ -189,7 +188,10 @@ class MapActivities {
     }
 }
 
-// async function main(){
+module.exports = MapActivities;
+
+//FAST TEST
+// (async function main(){
 //     let url = 'http://fcaenlinea1.unam.mx/planes_trabajo/deliver.php?f=asesor/upload/1353_TODOS.pdf';
 //     console.log(`Getting materials from: ${url}`);
 //     let time = Date.now();
@@ -204,8 +206,4 @@ class MapActivities {
 //         //     console.log(act);
 //         // }
 //     }
-// }
-
-// main();
-
-module.exports = MapActivities;
+// })();

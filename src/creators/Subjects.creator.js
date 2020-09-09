@@ -2,32 +2,56 @@ const MapSubjects = require('../lifters/MapSubjects'),
       MapMaterials = require('../lifters/MapMaterials'),
       Joiner = require('../normalizers/Joiner');
 
+/**
+ * SubjectsCreator it's a "creator", that means that the only purpose of this
+ * object it's to generate subject objects according to a certain semesterID.
+ * @class
+ */
 class SubjectsCreator {
+    /**
+     * 
+     * @param {Number} semesterID - the semester where will be selected the
+     * subjects.
+     */
     constructor(semesterID) {
         this.semesterID = semesterID;
     }
 
     /**
-     * @returns {Promise} an array with Subject objects.
+     * creates an array of subjects that belongs to the selected semester.
+     * @returns {Promise<Subject[]>} an array with Subject objects.
      */
-    async createSubjects() { 
-        let subjectManager = new MapSubjects(this.semesterID),
-            materialManager = new MapMaterials(this.semesterID);
-
+    async createSubjects() {
         try {
-            let subjects = await subjectManager.getSubjects();
-            let materials = await materialManager.getMaterials();
-
-            if(subjects.errors || materials.errors)
-                throw subjects.errors || materials.errors;
-
-            let joinManager = new Joiner(subjects.data, materials.data);
-            let joinedData = joinManager.joinThem();
-
-            return joinedData;
+            let subjects = await this.createSubjectObjects();
+            let materials = await this.createMaterialObjects();
+            let joinManager = new Joiner(subjects, materials);
+            return joinManager.joinThem();
         } catch(error) {
             console.log(error);
         }
+    }
+
+    /**
+     * @returns {Promise<Subject[]>} an array of subject objects.
+     */
+    async createSubjectObjects() {
+        let subjectManager = new MapSubjects(this.semesterID);
+        let subjects = await subjectManager.getSubjects();
+        if(!subjects || !subjects.success) 
+                throw subjects.errors || 'we cannot get the subjects correctly';
+        return subjects.data; 
+    }
+
+    /**
+     * @returns {Promise<Material[]>} an array of material objects.
+     */
+    async createMaterialObjects() {
+        let materialManager = new MapMaterials(this.semesterID);
+        let materials = await materialManager.getMaterials();
+        if(!materials || !materials.success)
+                throw materials.errors || 'we cannot get the subjects correctly';
+        return materials.data;
     }
 }
 

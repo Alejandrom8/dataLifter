@@ -1,24 +1,18 @@
 const DataBase = require('../DataBase');
 
-class MigrateSubjects{
+class MigrateSubjects {
     /**
      * 
-     * @param {{
-     * semesterID: Number,
-     * name: String,
-     * key: Object,
-     * planDeTrabajoURL: String,
-     * apunteURL: String,
-     * actividadesURL: String}[]} subjects 
+     * @param {Subject[]} subjects
      */
-    constructor(subjects){
+    constructor(subjects) {
         this.subjects = subjects;
     }
 
     /**
      * @returns {Promise} {succes, errors?}
      */
-    async migrate(){
+    async migrate() {
         let result = {success: false};
         let collection, client;
         try{

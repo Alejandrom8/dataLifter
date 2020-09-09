@@ -1,5 +1,5 @@
-exports.arrayToText = arr => {
-    return arr.reduce((acumulator, current) => (
-        acumulator + current + '\n'
-    ), '');
-}
+exports.arrayToText = arr => (
+    arr.reduce((accumulator, current) => (
+        accumulator + current + '\n'
+    ), '')
+);

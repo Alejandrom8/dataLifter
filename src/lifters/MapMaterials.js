@@ -6,7 +6,7 @@ const $ = require('cheerio'),
 
 /**
  * 	MapMaterials - an object that gets the URL's of the 'apuntes' and 
- * 'actividades' of each subject of the specified semester.
+ * 'acdtividades' of each subject of the specified semester.
  * @class
 */
 class MapMaterials {
@@ -30,10 +30,7 @@ class MapMaterials {
 		let result = {success: false};
 		try {
 			const pageHTML = await Scraper.scrap(this.URL);
-			if(!pageHTML) throw "We couldn't get the content of the specified URL";
-			let subjectMaterials = this.processHTML(pageHTML);
-
-			result.data = subjectMaterials;
+			result.data = this.processHTML(pageHTML);
 			result.success = true;
 		} catch(err) {
 			result.errors = err;
@@ -42,9 +39,9 @@ class MapMaterials {
 	}
 
 	/**
-	 * processHTML - proccess the recived html and returns an array of Material 
+	 * processHTML - process the recived html and returns an array of Material
 	 * objects.
-	 * @param {string} html - an html structrure in string type.
+	 * @param {string} html - an html structure in string type.
 	 * @returns {Material[]} an array with the materials extracted from the HTML.
 	 */
 	processHTML(html) {
@@ -97,7 +94,7 @@ class MapMaterials {
 				'attribs' in htmlElements[i] &&
 				'colspan' in htmlElements[i].attribs
 			) {
-				if(htmlElements[i].attribs.colspan == '2') {
+				if(htmlElements[i].attribs.colspan === '2') {
 					elementsFiltered.push(element.data);
 					elementsFiltered.push(element.data);
 					linkCounter = 0;
@@ -109,7 +106,7 @@ class MapMaterials {
 				if(element.children.length > 0) {
 					if('attribs' in element.children[0]) {
 						if('alt' in element.children[0].attribs) {
-							if(element.children[0].attribs.alt == 'Video Clase') {
+							if(element.children[0].attribs.alt === 'Video Clase') {
 								continue;
 							}
 						}
@@ -119,14 +116,14 @@ class MapMaterials {
 
 			if(linkCounter >= 2) {//apply this for elements in count 23 67 1011
 				//here are just the links 
-				if(element.name != 'a') { //if the element is not the expected (a)
+				if(element.name !== 'a') { //if the element is not the expected (a)
 					elementsFiltered.push(null);
 					continue;
 				}
 
 				element = this.baseURL + element.attribs.href;
 			} else {
-				if(element.name == 'p') { //if element has p children even text
+				if(element.name === 'p') { //if element has p children even text
 					element = element.children[0];
 				}
 				element = element.data;
@@ -134,7 +131,7 @@ class MapMaterials {
 
 			elementsFiltered.push(element);
 			//to determine when a block of 4 is done
-			linkCounter = linkCounter == 3 ? 0 : linkCounter+1;
+			linkCounter = linkCounter === 3 ? 0 : linkCounter+1;
 		}
 
 		return elementsFiltered;
@@ -166,18 +163,24 @@ class MapMaterials {
         const withoutModifications = mt.slice();
         let generalRoundSubjectsChecked = [];
         let final = [];
+		let additionalIndexes = ['a', 'c', 'i'];
+
+		const getCoincidences = i => withoutModifications.filter((sub, index) => {
+				  if(withoutModifications[i].key.number === sub.key.number) checked.push(index);
+				  return withoutModifications[i].key.number === sub.key.number;
+		      }),
+			  subjectIsChecked = (id) => generalRoundSubjectsChecked.indexOf(id),
+			  tagCoincidences = coincidences => (
+				  coincidences.map( (c, index) => {
+					  c.key.letter = additionalIndexes[index];
+					  return c;
+				  })
+			  );
   
         for(let i = 0; i < mt.length; i++) {
-			//searching in all the array the keys that are repited
-          	let coincidences = withoutModifications.filter((sub, index) => {
-				if(withoutModifications[i].key.number == sub.key.number) checked.push(index);
-				return withoutModifications[i].key.number == sub.key.number;
-			});
-			
-			if(
-				coincidences.length < 1 || 
-				generalRoundSubjectsChecked.indexOf(withoutModifications[i].key.number)
-			) {
+			//searching in all the array the keys that are repeated
+          	let coincidences = getCoincidences(i);
+			if(coincidences.length < 1 || subjectIsChecked(withoutModifications[i].key.number)) {
 				checked = [];
 				continue;
 			}
@@ -185,16 +188,9 @@ class MapMaterials {
 			//ISSUE - habrá problemas cuando admimistración e informática tengan
 			//una matería en común pero contaduría no. en tal caso, quedaría así:
 			//1151a (administración) 1151c (informática)...
-			let additionalIndexes = ['a', 'c', 'i'];
-			let changedKeys = coincidences.map((c, index) => {
-				c.key.letter = additionalIndexes[index];
-				return c;
-			});
-	
-			for(let indexCoincidences = 0; indexCoincidences < changedKeys.length; indexCoincidences++){
-				final.push(changedKeys[indexCoincidences]);
-			}
-	
+			let changedKeys = tagCoincidences(coincidences);
+			changedKeys.forEach(ck => final.push(ck));
+
 			checked = [];
 			generalRoundSubjectsChecked.push(withoutModifications[i].key);
         }
