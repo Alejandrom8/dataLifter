@@ -1,0 +1,1 @@
+{"version":3,"file":"Material.js","sourceRoot":"","sources":["../../src/entities/Material.ts"],"names":[],"mappings":";;;;;AAAA,gDAAwB;AAExB;;;GAGG;AACH,MAAqB,QAAQ;IAMzB;;;;;;;;OAQG;IACH,YAAY,GAAW,EAAE,SAAiB,EAAE,cAAsB;QAC9D,IAAI,CAAC,GAAG,GAAG,IAAI,aAAG,CAAC,GAAG,CAAC,CAAC;QACxB,IAAI,CAAC,SAAS,GAAG,SAAS,CAAC;QAC3B,IAAI,CAAC,cAAc,GAAG,cAAc,CAAC;IACzC,CAAC;CACJ;AApBD,2BAoBC"}
