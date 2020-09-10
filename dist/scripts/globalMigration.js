@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,7 +8,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const SubjectsCreator = require('../creators/Subjects.creator'), ModulesCreator = require('../creators/Modules.creator'), MigrateSubjects = require('../migrations/MigrateSubjects'), MigrateModules = require('../migrations/MigrateModules'), MigrateActivities = require('../migrations/MigrateActivities');
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const Subjects_creator_1 = __importDefault(require("../creators/Subjects.creator"));
+const Modules_creator_1 = __importDefault(require("../creators/Modules.creator"));
+const MigrateSubjects_1 = __importDefault(require("../migrations/MigrateSubjects"));
+const MigrateModules_1 = __importDefault(require("../migrations/MigrateModules"));
+const MigrateActivities_1 = __importDefault(require("../migrations/MigrateActivities"));
 let SEMESTER = parseInt(process.env.SEMESTER);
 if (!SEMESTER) {
     console.log("SEMESTER option is not specified");
@@ -25,12 +34,12 @@ if (!SEMESTER) {
          */
         const start = Date.now(); // starting time
         //getting subjects.
-        let subjectsCreatorManager = new SubjectsCreator(SEMESTER);
+        let subjectsCreatorManager = new Subjects_creator_1.default(SEMESTER);
         let pureSubjects = yield subjectsCreatorManager.createSubjects();
         console.log(`Created ${pureSubjects.length} subjects`);
         //getting modules and activities for each subject.
         let [modulesToMigrate, activitiesToMigrate] = yield createModulesAndActivities(pureSubjects);
-        let migrators = [MigrateSubjects, MigrateModules, MigrateActivities];
+        let migrators = [MigrateSubjects_1.default, MigrateModules_1.default, MigrateActivities_1.default];
         let elementsToMigrate = [pureSubjects, modulesToMigrate, activitiesToMigrate];
         let labels = ['subjects', 'modules', 'activities'];
         for (let i = 0; i < elementsToMigrate.length; i++) {
@@ -58,7 +67,7 @@ function createModulesAndActivities(subjects) {
         let modulesToMigrate = [], activitiesToMigrate = [];
         for (let subject of subjects) {
             //creating modules and activities
-            let modulesCreatorManager = new ModulesCreator(subject);
+            let modulesCreatorManager = new Modules_creator_1.default(subject);
             let result = yield modulesCreatorManager.createModules();
             modulesToMigrate.push(...result.modules);
             activitiesToMigrate.push(...result.activities);

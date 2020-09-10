@@ -1,3 +1,5 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Deconstruct the given key into an analytical version of the same key and
  * it is grouped into a Key object.
@@ -23,5 +25,5 @@ class Key {
         classify this subject*/
     }
 }
-module.exports = Key;
+exports.default = Key;
 //# sourceMappingURL=Key.js.map

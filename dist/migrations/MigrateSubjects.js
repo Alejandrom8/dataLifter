@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,11 +8,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const DataBase = require('../DataBase');
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const DataBase_1 = __importDefault(require("../DataBase"));
 class MigrateSubjects {
     /**
      *
-     * @param {Subject[]} subjects
+     * @param subjects - the subjects to be migrated
      */
     constructor(subjects) {
         this.subjects = subjects;
@@ -24,7 +29,7 @@ class MigrateSubjects {
             let result = { success: false };
             let collection, client;
             try {
-                [collection, client] = yield DataBase.getCollection('subject');
+                [collection, client] = yield DataBase_1.default.getCollection('subject');
                 let insert = yield collection.insertMany(this.subjects);
                 if (!insert.result.ok)
                     throw 'No se logro subir correctamente las asignaturas';
@@ -41,5 +46,5 @@ class MigrateSubjects {
         });
     }
 }
-module.exports = MigrateSubjects;
+exports.default = MigrateSubjects;
 //# sourceMappingURL=MigrateSubjects.js.map

@@ -1,4 +1,9 @@
-const Key = require('./Key');
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const Key_1 = __importDefault(require("./Key"));
 /**
  * creates an instance of the Material class.
  * @class
@@ -14,10 +19,10 @@ class Material {
      * file for this bunch of materials.
      */
     constructor(key, apunteURL, actividadesURL) {
-        this.key = new Key(key);
+        this.key = new Key_1.default(key);
         this.apunteURL = apunteURL;
         this.actividadesURL = actividadesURL;
     }
 }
-module.exports = Material;
+exports.default = Material;
 //# sourceMappingURL=Material.js.map

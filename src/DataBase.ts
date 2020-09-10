@@ -20,7 +20,7 @@ export default class DataBase {
      * @param {String} collectionName - the name of the mongo collection.
      * @returns {Promise<(Collection|MongoClient)[]>}
      */
-    public static async getCollection(collectionName: string): Promise<(Collection | MongoClient)[]> {
+    public static async getCollection(collectionName: string): Promise<[Collection, MongoClient]> {
         let client = await DataBase.getClient();
         let db = client.db(config.database.mongodb.db);
         let collection = db.collection(collectionName);

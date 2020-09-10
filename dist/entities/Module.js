@@ -1,4 +1,6 @@
-const { genRandomKey } = require('../helpers/generators');
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const generators_1 = require("../helpers/generators");
 /**
  * creates an instance of the Module class
  * @class
@@ -12,11 +14,11 @@ class Module {
      * @param {Number} index - the index that sort each module.
      */
     constructor(subjectID, moduleTitle, index) {
-        this.moduleID = genRandomKey();
+        this.moduleID = generators_1.genRandomKey();
         this.subjectID = subjectID;
         this.moduleTitle = moduleTitle;
         this.index = index;
     }
 }
-module.exports = Module;
+exports.default = Module;
 //# sourceMappingURL=Module.js.map

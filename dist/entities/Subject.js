@@ -1,11 +1,17 @@
-const Key = require('./Key'), { genRandomKey } = require('../helpers/generators');
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const Key_1 = __importDefault(require("./Key"));
+const generators_1 = require("../helpers/generators");
 /**
  * creates a new Subject instance.
  * @class
  */
 class Subject {
     /**
-     * @param {String} semesterID - the number of the semester to which this
+     * @param {number} semesterID - the number of the semester to which this
      * subject belongs.
      * @param {String} name - name of the subject.
      * @param {String} key - the real key (that one given by the university)
@@ -20,14 +26,12 @@ class Subject {
      * PDF document of this subject. This one will only exists for the SUA
      * education mode.
      */
-    constructor(semesterID, name, key, planDeTrabajoURL = '', apunteURL = '', actividadesURL = '') {
-        this.subjectID = genRandomKey();
+    constructor(semesterID, name, key, planDeTrabajoURL = '') {
+        this.subjectID = generators_1.genRandomKey();
         this.semesterID = semesterID;
-        this.key = new Key(key);
+        this.key = new Key_1.default(key);
         this.name = name;
         this.planDeTrabajoURL = planDeTrabajoURL;
-        this.apunteURL = apunteURL;
-        this.actividadesURL = actividadesURL;
     }
     /**
      *
@@ -41,5 +45,5 @@ class Subject {
         this.actividadesURL = actividadesURL;
     }
 }
-module.exports = Subject;
+exports.default = Subject;
 //# sourceMappingURL=Subject.js.map

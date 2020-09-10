@@ -1,4 +1,6 @@
-const { genRandomKey } = require('../helpers/generators');
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const generators_1 = require("../helpers/generators");
 /**
  * creates an instance of an Activity object.
  * @class
@@ -15,12 +17,12 @@ class Activity {
      * @param {String} activityTitle - the index read from the pdf for this activity.
      */
     constructor(moduleID, content, index, activityTitle) {
-        this.activityID = genRandomKey();
+        this.activityID = generators_1.genRandomKey();
         this.moduleID = moduleID;
         this.content = content;
         this.index = index;
         this.activityTitle = activityTitle;
     }
 }
-module.exports = Activity;
+exports.default = Activity;
 //# sourceMappingURL=Activity.js.map

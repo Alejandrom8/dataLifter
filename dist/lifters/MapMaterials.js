@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,7 +8,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const $ = require('cheerio'), Material = require('../entities/Material'), Scraper = require('./Scraper'), config = require('../../config'), { insertionSort } = require('../normalizers/sorters');
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const cheerio_1 = __importDefault(require("cheerio"));
+const Material_1 = __importDefault(require("../entities/Material"));
+const Scraper_1 = __importDefault(require("./Scraper"));
+const config_json_1 = __importDefault(require("../config.json"));
+const sorters_1 = require("../normalizers/sorters");
 /**
  * 	MapMaterials - an object that gets the URL's of the 'apuntes' and
  * 'acdtividades' of each subject of the specified semester.
@@ -20,7 +29,7 @@ class MapMaterials {
     */
     constructor(semesterID, plan = '2016') {
         //where we are going to get the data.
-        this.baseURL = config.scraping.baseURLForMaterials;
+        this.baseURL = config_json_1.default.scraping.baseURLForMaterials;
         this.plan = plan;
         this.semesterID = semesterID;
         this.URL = `${this.baseURL}plan${this.plan}_${this.semesterID}.php`;
@@ -33,7 +42,7 @@ class MapMaterials {
         return __awaiter(this, void 0, void 0, function* () {
             let result = { success: false };
             try {
-                const pageHTML = yield Scraper.scrap(this.URL);
+                const pageHTML = yield Scraper_1.default.scrap(this.URL);
                 result.data = this.processHTML(pageHTML);
                 result.success = true;
             }
@@ -52,10 +61,10 @@ class MapMaterials {
     processHTML(html) {
         //gettin the 'claves'. patron: center-left-center-center. [clave, nombre, apunte, actividades];
         const generalSelector = `table.tablaamarilla > tbody tr >`, type_1 = `${generalSelector} td.tablaamarilla[valign="middle"][bgcolor="#E6E6E6"]`, type_2 = `${generalSelector} td.estilos[valign="middle"][bgcolor="#E6E6E6"]`, selector = `${type_1}, ${type_2}`;
-        let subjectMaterials = this.getElementsFromHTML(selector, html);
-        subjectMaterials = this.groupMaterials(subjectMaterials);
+        let stringElements = this.getElementsFromHTML(selector, html);
+        let subjectMaterials = this.groupMaterials(stringElements);
         subjectMaterials = this.checkSimilarSubjects(subjectMaterials);
-        subjectMaterials = insertionSort(subjectMaterials);
+        subjectMaterials = sorters_1.insertionSort(subjectMaterials);
         return subjectMaterials;
     }
     /**
@@ -67,19 +76,21 @@ class MapMaterials {
      * filters.
      */
     getElementsFromHTML(cssSelector, html) {
-        const htmlElements = $(cssSelector, html);
+        var _a, _b, _c, _d;
+        const htmlElements = cheerio_1.default(cssSelector, html);
         let elementsFiltered = [], linkCounter = 0;
+        let current;
         for (let i = 0; i < htmlElements.length; i++) {
             if (typeof htmlElements[i] == 'undefined')
                 continue;
-            let element = htmlElements[i].children[0];
+            current = htmlElements[i].children[0];
             /*if the element is a colspan of two and have the indicated text,
             skip two elements. and continue to the next element.*/
-            if ('data' in element) {
-                if (element.data === 'Consultar plan de trabajo' ||
-                    element.data === 'Consulta el plan de trabajo') {
-                    elementsFiltered.push(element.data);
-                    elementsFiltered.push(element.data);
+            if ('data' in current) {
+                if (current.data === 'Consultar plan de trabajo' ||
+                    current.data === 'Consulta el plan de trabajo') {
+                    elementsFiltered.push(current.data);
+                    elementsFiltered.push(current.data);
                     linkCounter = 0;
                     continue;
                 }
@@ -87,38 +98,37 @@ class MapMaterials {
             if ('attribs' in htmlElements[i] &&
                 'colspan' in htmlElements[i].attribs) {
                 if (htmlElements[i].attribs.colspan === '2') {
-                    elementsFiltered.push(element.data);
-                    elementsFiltered.push(element.data);
+                    elementsFiltered.push(current.data);
+                    elementsFiltered.push(current.data);
                     linkCounter = 0;
                     continue;
                 }
             }
-            if ('children' in element) { //if the element is a Video clase, skip it
-                if (element.children.length > 0) {
-                    if ('attribs' in element.children[0]) {
-                        if ('alt' in element.children[0].attribs) {
-                            if (element.children[0].attribs.alt === 'Video Clase') {
-                                continue;
-                            }
+            //if('children' in current) { //if the element is a Video clase, skip it
+            if (((_a = current.children) === null || _a === void 0 ? void 0 : _a.length) > 0) {
+                if ('attribs' in current.children[0]) {
+                    if ('alt' in ((_b = current.children[0]) === null || _b === void 0 ? void 0 : _b.attribs)) {
+                        if (((_d = (_c = current.children[0]) === null || _c === void 0 ? void 0 : _c.attribs) === null || _d === void 0 ? void 0 : _d.alt) === 'Video Clase') {
+                            continue;
                         }
                     }
                 }
             }
+            //}
             if (linkCounter >= 2) { //apply this for elements in count 23 67 1011
                 //here are just the links 
-                if (element.name !== 'a') { //if the element is not the expected (a)
+                if (current.name !== 'a') { //if the element is not the expected (a)
                     elementsFiltered.push(null);
                     continue;
                 }
-                element = this.baseURL + element.attribs.href;
+                elementsFiltered.push(this.baseURL + current.attribs.href);
             }
             else {
-                if (element.name === 'p') { //if element has p children even text
-                    element = element.children[0];
+                if (current.name === 'p') { //if element has p children even text
+                    current = current.children[0];
                 }
-                element = element.data;
+                elementsFiltered.push(current.data);
             }
-            elementsFiltered.push(element);
             //to determine when a block of 4 is done
             linkCounter = linkCounter === 3 ? 0 : linkCounter + 1;
         }
@@ -136,7 +146,7 @@ class MapMaterials {
             clave = (clave.replace(/(^\s*(?!.+)\n+)|(\n+\s+(?!.+)$)/g, "")).trim();
             apunteURL = subjects[i + 2];
             actividadesURL = subjects[i + 3];
-            material = new Material(clave, apunteURL, actividadesURL);
+            material = new Material_1.default(clave, apunteURL, actividadesURL);
             sorted.push(material);
         }
         return sorted;
@@ -173,5 +183,5 @@ class MapMaterials {
         return mt;
     }
 }
-module.exports = MapMaterials;
+exports.default = MapMaterials;
 //# sourceMappingURL=MapMaterials.js.map

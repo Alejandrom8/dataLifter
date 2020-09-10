@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,7 +8,59 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const { arrayToText } = require('../helpers/converters'), Scraper = require('./Scraper'), Modules = require('../entities/groupers/Modules');
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const converters_1 = require("../helpers/converters");
+const Scraper_1 = __importDefault(require("./Scraper"));
+const Modules_1 = __importDefault(require("../entities/groupers/Modules"));
+class Line {
+    constructor(line) {
+        /**
+         * get just the numbers of a line of thext.
+         * @param {String} line - the line of text where the numbers will be
+         * extracted.
+         * @returns {String} the first number founded.
+         */
+        this.getNumber = () => this.getElement(/[0-9]+/g);
+        this.line = line;
+    }
+    /**
+     *
+     * @param {string} line
+     * @param {RegExp} matcher
+     * @returns {String} the first element that matches with the matcher RegExp
+     */
+    getElement(matcher) {
+        if (!this.line)
+            return '';
+        let result = this.line.match(matcher);
+        return result ? result[0] : '';
+    }
+    /**
+     *
+     * @param {String} line
+     * @returns {Boolean} true if the line is '' or null or undefined or does not
+     * contain anything but spaces.
+     */
+    isEmpty() {
+        return !this.line ||
+            this.line.replace(/\s+/g, '').length === 0;
+    }
+    /**
+     * creates a new string with just letters.
+     * @param {String} line
+     * @returns {String} a line with just alfabetic characters (a-zA-Z)
+     */
+    getText() {
+        if (!this.line)
+            return '';
+        let result = this.line.toLowerCase();
+        result = result.replace(/[\s.;:,?%0-9]+/g, '');
+        return result;
+    }
+}
 class MapActivities {
     /**
      *
@@ -18,13 +71,6 @@ class MapActivities {
      * @param {String} pdfURL - where the data will be scrapped.
      */
     constructor(semesterID, subjectID, pdfURL) {
-        /**
-         * get just the numbers of a line of thext.
-         * @param {String} line - the line of text where the numbers will be
-         * extracted.
-         * @returns {String} the first number founded.
-         */
-        this.getNumber = line => this.getElement(line, /[0-9]+/g);
         this.semesterID = semesterID;
         this.subjectID = subjectID;
         this.pdfURL = pdfURL;
@@ -37,10 +83,10 @@ class MapActivities {
      */
     formGroups() {
         return __awaiter(this, void 0, void 0, function* () {
-            let fileContent = yield Scraper.scrapPDF(this.pdfURL);
+            let fileContent = yield Scraper_1.default.scrapPDF(this.pdfURL);
             let modules = this.getModules(fileContent.text);
             let modulesAndActivities = this.getActivities(modules);
-            let modulesContainer = new Modules(this.subjectID, modulesAndActivities);
+            let modulesContainer = new Modules_1.default(this.subjectID, modulesAndActivities);
             return modulesContainer;
         });
     }
@@ -52,7 +98,7 @@ class MapActivities {
      * - object.text: String - the segmented text for each module.
      */
     getModules(content) {
-        const lines = content.split('\n');
+        const lines = content.split('\n').map(l => new Line(l));
         let modules = this.getElements(lines, 'unidad');
         return modules;
     }
@@ -67,11 +113,13 @@ class MapActivities {
      */
     getActivities(modules) {
         let modulesAndActivities = modules.map(unity => {
-            let lines = unity.text.split('\n');
+            let lines = unity.text.split('\n').map(l => new Line(l));
             let activities = this.getElements(lines, 'actividad');
-            unity.actividades = activities;
-            delete unity.text;
-            return unity;
+            let module = {
+                unidad: unity.unidad,
+                actividades: activities
+            };
+            return module;
         });
         return modulesAndActivities;
     }
@@ -89,12 +137,12 @@ class MapActivities {
         let blocks = [];
         let lineText;
         for (let lineNumber = 0; lineNumber < lines.length; lineNumber++) {
-            lineText = this.getText(lines[lineNumber]);
+            lineText = lines[lineNumber].getText();
             if (lineText === divider) {
-                let { block, analizedLines } = this.blocker(lineNumber, lines, divider);
+                let { block, analyzedLines } = this.blocker(lineNumber, lines, divider);
                 blocks.push(block);
                 //We continue where the parser of the blocker function is left.
-                lineNumber += analizedLines - 1;
+                lineNumber += analyzedLines - 1;
             }
         }
         return blocks;
@@ -107,62 +155,27 @@ class MapActivities {
      * @returns {Object[]} ??
      */
     blocker(index, lines, divider) {
-        let result = {}, block = {}, j = index, blank = 0, analyzedLines = 0, currentLine, isNotDivider;
+        let result = { block: null, analyzedLines: 0 }, block = { text: '' }, textLines = [], j = index, blank = 0, currentLine, isNotDivider;
         block[divider] =
-            this.getNumber(lines[j]) ||
-                this.getNumber(lines[j + 1]) ||
+            lines[j].getNumber() ||
+                lines[j + 1].getNumber() ||
                 lines[j + 1];
-        block.text = [];
         currentLine = lines[++j]; //then we skip it to do not work with that text
         do {
-            !this.isEmpty(currentLine) ?
-                block.text.push(currentLine) :
+            !currentLine.isEmpty() ?
+                textLines.push(currentLine.line) :
                 blank++;
             j++;
-            analyzedLines++;
+            result.analyzedLines++;
             currentLine = lines[j];
-            isNotDivider = this.getText(currentLine) !== divider;
+            isNotDivider = currentLine.getText() !== divider;
         } while (isNotDivider && blank < 10 && j < lines.length);
-        block.text = arrayToText(block.text);
+        block.text = converters_1.arrayToText(textLines);
         result.block = block;
-        result.analizedLines = analyzedLines;
-        return result;
-    }
-    /**
-     *
-     * @param {string} line
-     * @param {RegExp} matcher
-     * @returns {String} the first element that matches with the matcher RegExp
-     */
-    getElement(line, matcher) {
-        if (!line)
-            return '';
-        let result = line.match(matcher);
-        return result ? result[0] : result;
-    }
-    /**
-     *
-     * @param {String} line
-     * @returns {Boolean} true if the line is '' or null or undefined or does not
-     * contain anything but spaces.
-     */
-    isEmpty(line) {
-        return !line ||
-            line.replace(/\s+/g, '').length === 0;
-    }
-    /**
-     * creates a new string with just letters.
-     * @param {String} line
-     * @returns {String} a line with just alfabetic characters (a-zA-Z)
-     */
-    getText(line) {
-        if (!line)
-            return '';
-        let result = line.toLowerCase();
-        result = result.replace(/[\s.;:,?%0-9]+/g, '');
         return result;
     }
 }
+exports.default = MapActivities;
 module.exports = MapActivities;
 //FAST TEST
 // (async function main(){

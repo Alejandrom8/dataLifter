@@ -8,7 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const rp = require('request-promise'), $ = require('cheerio'), crawler = require('crawler-request');
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const request_promise_1 = __importDefault(require("request-promise"));
+const cheerio_1 = __importDefault(require("cheerio"));
+const crawler_request_1 = __importDefault(require("crawler-request"));
 /**
  * groups a bounch of functions that help to make web scrapping
  * @class
@@ -25,7 +31,7 @@ class Scraper {
         return __awaiter(this, void 0, void 0, function* () {
             let result = yield new Promise((resolve, reject) => {
                 let config = { uri: URL, encoding: encoding };
-                rp(config)
+                request_promise_1.default(config)
                     .then(html => resolve(html))
                     .catch(err => reject(err));
             });
@@ -40,7 +46,7 @@ class Scraper {
      */
     static scrapPDF(URL) {
         return __awaiter(this, void 0, void 0, function* () {
-            let response = yield crawler(URL);
+            let response = yield crawler_request_1.default(URL);
             return response;
         });
     }
@@ -67,7 +73,7 @@ class Scraper {
     * the html.
     */
     static getElementsFromHTML({ cssSelector, html, filter, steps = { init: 0, size: 1 } }) {
-        let elements = $(cssSelector, html), elementsFiltered = [];
+        let elements = cheerio_1.default(cssSelector, html), elementsFiltered = [];
         for (let i = steps.init; i < Object.keys(elements).length; i += steps.size) {
             if (typeof elements[i] == 'undefined')
                 continue;
@@ -76,5 +82,5 @@ class Scraper {
         return elementsFiltered;
     }
 }
-module.exports = Scraper;
+exports.default = Scraper;
 //# sourceMappingURL=Scraper.js.map

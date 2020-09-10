@@ -3,14 +3,14 @@ import $ from 'cheerio';
 import crawler from 'crawler-request';
 
 interface Filter {
-	(element: CheerioElement): CheerioElement
+	(element: CheerioElement): string
 }
 
 interface HTMLScrapConfig {
 	cssSelector: string
 	html: string
 	filter: Filter
-	steps: {init: number, size: number}
+	steps?: {init: number, size: number}
 }
 
 /**
@@ -73,7 +73,7 @@ export default class Scraper {
 		html,
 		filter,
 		steps = {init: 0, size: 1}
-	}: HTMLScrapConfig): CheerioElement[] {
+	}: HTMLScrapConfig): string[] {
         let elements = $(cssSelector, html),
             elementsFiltered = [];
 

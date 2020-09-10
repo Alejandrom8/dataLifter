@@ -1,14 +1,14 @@
-const SubjectsCreator = require('../creators/Subjects.creator'),
-      ModulesCreator = require('../creators/Modules.creator'),
-      MigrateSubjects = require('../migrations/MigrateSubjects'),
-      MigrateModules = require('../migrations/MigrateModules'),
-      MigrateActivities = require('../migrations/MigrateActivities');
+import SubjectsCreator from '../creators/Subjects.creator';
+import ModulesCreator from '../creators/Modules.creator';
+import MigrateSubjects from '../migrations/MigrateSubjects';
+import MigrateModules from '../migrations/MigrateModules';
+import MigrateActivities from '../migrations/MigrateActivities';
 
 let SEMESTER = parseInt(process.env.SEMESTER);
 
 if(!SEMESTER) {
-   console.log("SEMESTER option is not specified")
-   return
+    console.log("SEMESTER option is not specified")
+    return
 }
 
 (async function main() {

@@ -1,3 +1,5 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 class Modules {
     /**
      *
@@ -10,5 +12,5 @@ class Modules {
         this.modulesList = modules;
     }
 }
-module.exports = Modules;
+exports.default = Modules;
 //# sourceMappingURL=Modules.js.map

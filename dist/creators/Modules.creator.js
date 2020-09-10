@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,7 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const MapModules = require('../lifters/MapModules'), Tagger = require('../normalizers/Tagger');
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const MapModules_1 = __importDefault(require("../lifters/MapModules"));
+const Tagger_1 = __importDefault(require("../normalizers/Tagger"));
 /**
  * ModulesCreator its a "creator" for Module and Activity objects, it's simple
  * method "createModules" creates an array of Module objets and other of
@@ -36,9 +42,9 @@ class ModulesCreator {
      */
     createModules() {
         return __awaiter(this, void 0, void 0, function* () {
-            let map_manager = new MapModules(this.semesterID, this.subjectID, this.subjectPDF);
+            let map_manager = new MapModules_1.default(this.semesterID, this.subjectID, this.subjectPDF);
             let modules = yield map_manager.formGroups();
-            let tag_manager = new Tagger(modules);
+            let tag_manager = new Tagger_1.default(modules);
             let [taggedModules, taggedActivities] = tag_manager.getSeparatedModulesAndActivities();
             return {
                 modules: taggedModules,
@@ -47,7 +53,7 @@ class ModulesCreator {
         });
     }
 }
-module.exports = ModulesCreator;
+exports.default = ModulesCreator;
 /*
 FAST TEST
 

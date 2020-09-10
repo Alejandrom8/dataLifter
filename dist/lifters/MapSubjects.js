@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,11 +8,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const Subject = require('../entities/Subject'), Scraper = require('./Scraper'), config = require('../../config'), { insertionSort } = require('../normalizers/sorters');
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const Subject_1 = __importDefault(require("../entities/Subject"));
+const Scraper_1 = __importDefault(require("./Scraper"));
+const config_json_1 = __importDefault(require("../config.json"));
+const sorters_1 = require("../normalizers/sorters");
 class MapSubjects {
     constructor(semesterID) {
         this.semesterID = semesterID;
-        this.baseURL = config.scraping.baseURLForSubjects;
+        this.baseURL = config_json_1.default.scraping.baseURLForSubjects;
         this.subjectKeys = [];
     }
     /**
@@ -24,11 +31,11 @@ class MapSubjects {
             const url = this.baseURL + this.semesterID;
             console.log(`Getting subjects for semester: ${this.semesterID}. From: ${url}`);
             try {
-                const pageContent = yield Scraper.scrap(url, 'latin1');
+                const pageContent = yield Scraper_1.default.scrap(url, 'latin1');
                 let asignaturas = this.processHTML(pageContent);
                 if (!asignaturas)
                     throw "Hubo un error al completar las asignaturas";
-                asignaturas = insertionSort(asignaturas);
+                asignaturas = sorters_1.insertionSort(asignaturas);
                 result.data = asignaturas;
                 result.success = true;
             }
@@ -64,16 +71,16 @@ class MapSubjects {
         const urlsElementsClassifier = {
             cssSelector: 'td[width=51].nombre > span.grupo',
             html: html,
-            filter: element => {
+            filter: (element) => {
                 /*
               let generic_link = element.children[1].attribs.href;
                 commented while the FCA website puts the links again
                  */
-                let url = `${config.scraping.baseURLForWorkPlans}${''}`; /*here should be generic_link*/
+                let url = `${config_json_1.default.scraping.baseURLForWorkPlans}${''}`; /*here should be generic_link*/
                 return url;
             }
         };
-        let subjectNames = Scraper.getElementsFromHTML(subjectElementsClassifier), keys = Scraper.getElementsFromHTML(keyElementsClassifier), urls = Scraper.getElementsFromHTML(urlsElementsClassifier);
+        let subjectNames = Scraper_1.default.getElementsFromHTML(subjectElementsClassifier), keys = Scraper_1.default.getElementsFromHTML(keyElementsClassifier), urls = Scraper_1.default.getElementsFromHTML(urlsElementsClassifier);
         if (subjectNames.length !== keys.length || subjectNames.length !== urls.length) {
             throw "There was a problem while trying to process the specified html";
         }
@@ -93,9 +100,8 @@ class MapSubjects {
     classifySubjects(names, keys, pt_urls) {
         let subjects = [];
         for (let subjectIndex = 0; subjectIndex < names.length; subjectIndex++) {
-            let subject = new Subject(this.semesterID, names[subjectIndex], (keys[subjectIndex]
-                .replace(/(^\s*(?!.+)\n+)|(\n+\s+(?!.+)$)/g, ""))
-                .trim(), pt_urls[subjectIndex]);
+            let subject = new Subject_1.default(this.semesterID, names[subjectIndex], (keys[subjectIndex]
+                .replace(/(^\s*(?!.+)\n+)|(\n+\s+(?!.+)$)/g, "")).trim(), pt_urls[subjectIndex]);
             subjects.push(subject);
             this.subjectKeys.push(subject.key);
         }
@@ -120,5 +126,6 @@ class MapSubjects {
         return subjects;
     }
 }
+exports.default = MapSubjects;
 module.exports = MapSubjects;
 //# sourceMappingURL=MapSubjects.js.map

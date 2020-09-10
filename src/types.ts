@@ -22,3 +22,19 @@ export interface Subject {
     apunteURL: string | string[];
     actividadesURL: string | string[];
 }
+
+export interface Block {
+    text: string
+    unidad?: string
+    actividad?: string
+}
+
+export interface BlockingResult {
+    block: Block
+    analyzedLines: number
+}
+
+export interface PreModule {
+    unidad: string
+    actividades: Block[]
+}

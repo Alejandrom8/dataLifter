@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.insertionSort = void 0;
 exports.insertionSort = subjects => {
     let val, index;
     for (let i = 1; i < subjects.length; i++) {

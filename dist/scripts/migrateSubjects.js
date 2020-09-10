@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 const SubjectsCreator = require('../creators/Subjects.creator');
-const MigrateSubjects = require('../migrations/MigrateSubjects');
+const MigrateSubjects = require('../migrations/MigrateSubjects').default;
 const semester = process.env.SEMESTER || 1;
 function generateSubjects(semesterID) {
     return __awaiter(this, void 0, void 0, function* () {

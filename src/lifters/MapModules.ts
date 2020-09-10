@@ -1,23 +1,7 @@
 import { arrayToText } from '../helpers/converters';
 import Scraper from './Scraper';
 import Modules from '../entities/groupers/Modules';
-
-
-interface Block {
-    text: string
-    unidad?: string
-    actividad?: string
-}
-
-interface BlockingResult {
-    block: Block
-    analyzedLines: number
-}
-
-export interface PreModule {
-    unidad: string
-    actividades: Block[]
-}
+import {Block, BlockingResult, PreModule} from '../types';
 
 class Line {
 

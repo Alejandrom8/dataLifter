@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,7 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const MapSubjects = require('../lifters/MapSubjects'), MapMaterials = require('../lifters/MapMaterials'), Joiner = require('../normalizers/Joiner');
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const MapSubjects_1 = __importDefault(require("../lifters/MapSubjects"));
+const MapMaterials_1 = __importDefault(require("../lifters/MapMaterials"));
+const Joiner_1 = __importDefault(require("../normalizers/Joiner"));
 /**
  * SubjectsCreator it's a "creator", that means that the only purpose of this
  * object it's to generate subject objects according to a certain semesterID.
@@ -31,7 +38,7 @@ class SubjectsCreator {
             try {
                 let subjects = yield this.createSubjectObjects();
                 let materials = yield this.createMaterialObjects();
-                let joinManager = new Joiner(subjects, materials);
+                let joinManager = new Joiner_1.default(subjects, materials);
                 return joinManager.joinThem();
             }
             catch (error) {
@@ -44,7 +51,7 @@ class SubjectsCreator {
      */
     createSubjectObjects() {
         return __awaiter(this, void 0, void 0, function* () {
-            let subjectManager = new MapSubjects(this.semesterID);
+            let subjectManager = new MapSubjects_1.default(this.semesterID);
             let subjects = yield subjectManager.getSubjects();
             if (!subjects || !subjects.success)
                 throw subjects.errors || 'we cannot get the subjects correctly';
@@ -56,7 +63,7 @@ class SubjectsCreator {
      */
     createMaterialObjects() {
         return __awaiter(this, void 0, void 0, function* () {
-            let materialManager = new MapMaterials(this.semesterID);
+            let materialManager = new MapMaterials_1.default(this.semesterID);
             let materials = yield materialManager.getMaterials();
             if (!materials || !materials.success)
                 throw materials.errors || 'we cannot get the subjects correctly';
@@ -64,5 +71,5 @@ class SubjectsCreator {
         });
     }
 }
-module.exports = SubjectsCreator;
+exports.default = SubjectsCreator;
 //# sourceMappingURL=Subjects.creator.js.map

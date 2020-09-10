@@ -1,20 +1,27 @@
-const DataBase = require('../DataBase');
+import { Collection, MongoClient } from 'mongodb';
+import DataBase from '../DataBase';
+import Subject from '../entities/Subject';
+import {ServiceResult} from '../types';
 
-class MigrateSubjects {
+export default class MigrateSubjects {
+
+    public subjects: Subject[];
+
     /**
      * 
-     * @param {Subject[]} subjects
+     * @param subjects - the subjects to be migrated
      */
-    constructor(subjects) {
+    constructor(subjects: Subject[]) {
         this.subjects = subjects;
     }
 
     /**
      * @returns {Promise} {succes, errors?}
      */
-    async migrate() {
-        let result = {success: false};
-        let collection, client;
+    async migrate(): Promise<ServiceResult> {
+        let result:ServiceResult = {success: false};
+        let collection: Collection, client: MongoClient;
+
         try{
             [collection, client] = await DataBase.getCollection('subject');
             let insert = await collection.insertMany(this.subjects);
@@ -31,5 +38,3 @@ class MigrateSubjects {
         return result;
     }
 }
-
-module.exports = MigrateSubjects;

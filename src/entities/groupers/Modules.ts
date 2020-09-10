@@ -1,5 +1,4 @@
-import Module from "../Module";
-import {PreModule} from '../../lifters/MapModules';
+import {PreModule} from '../../types';
 
 export default class Modules {
 

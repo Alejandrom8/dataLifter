@@ -1,4 +1,5 @@
-const Subject = require('../entities/Subject');
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * this class has the only propouse to merge an Array of Subjects and another of
  * Materials.
@@ -60,5 +61,5 @@ class Joiner {
         return [apuntes, actividades];
     }
 }
-module.exports = Joiner;
+exports.default = Joiner;
 //# sourceMappingURL=Joiner.js.map

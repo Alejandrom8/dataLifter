@@ -4,12 +4,12 @@
   "description": "A lifter for the data from the FCA SUA website.",
   "main": "dist/index.js",
   "scripts": {
-    "start": "tsc && node dist/index.js",
+    "start": "tsc && npm run globalMigration",
     "build": "webpack",
     "test": "jest",
     "migrateSubjects": "node scripts/migrateSubjects.js",
     "migrateActivities": "node scripts/migrateActivities.js",
-    "globalMigration": "node scripts/globalMigration.js"
+    "globalMigration": "node dist/scripts/globalMigration.js"
   },
   "author": "Alejandro Gómez García <alejandro.originx@gmail.com>",
   "license": "ISC",
