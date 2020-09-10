@@ -1,0 +1,1 @@
+{"version":3,"file":"Modules.js","sourceRoot":"","sources":["../../../src/entities/groupers/Modules.js"],"names":[],"mappings":"AAAA,MAAM,OAAO;IAET;;;;;OAKG;IACH,YAAY,SAAS,EAAE,OAAO;QAC1B,IAAI,CAAC,SAAS,GAAG,SAAS,CAAC;QAC3B,IAAI,CAAC,WAAW,GAAG,OAAO,CAAC;IAC/B,CAAC;CACJ;AAED,MAAM,CAAC,OAAO,GAAG,OAAO,CAAC"}
