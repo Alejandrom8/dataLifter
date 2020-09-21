@@ -115,11 +115,11 @@ class MapActivities {
         let modulesAndActivities = modules.map(unity => {
             let lines = unity.text.split('\n').map(l => new Line(l));
             let activities = this.getElements(lines, 'actividad');
-            let module = {
+            let moduleobj = {
                 unidad: unity.unidad,
                 actividades: activities
             };
-            return module;
+            return moduleobj;
         });
         return modulesAndActivities;
     }
@@ -168,7 +168,7 @@ class MapActivities {
             j++;
             result.analyzedLines++;
             currentLine = lines[j];
-            isNotDivider = currentLine.getText() !== divider;
+            isNotDivider = currentLine && currentLine.getText() !== divider;
         } while (isNotDivider && blank < 10 && j < lines.length);
         block.text = converters_1.arrayToText(textLines);
         result.block = block;

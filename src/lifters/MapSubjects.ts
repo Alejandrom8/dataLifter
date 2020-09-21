@@ -72,11 +72,8 @@ export default class MapSubjects {
         cssSelector: 'td[width=51].nombre > span.grupo',
         html: html,
         filter: (element: CheerioElement): string => {
-            /*
           let generic_link = element.children[1].attribs.href;
-            commented while the FCA website puts the links again
-             */
-          let url = `${config.scraping.baseURLForWorkPlans}${''}`;/*here should be generic_link*/
+          let url = `${config.scraping.baseURLForWorkPlans}${generic_link}`;/*here should be generic_link*/
           return url;
         }
       }

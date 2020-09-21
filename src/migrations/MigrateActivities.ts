@@ -1,12 +1,20 @@
-const DataBase = require('../DataBase');
+import { Collection, MongoClient } from 'mongodb';
+import DataBase from '../DataBase';
+import Activity from '../entities/Activity';
+import { ServiceResult } from '../types';
 
-class MigrateActivities {
-    constructor(activities) {
+export default class MigrateActivities {
+
+    private activities: Activity[]
+
+    constructor(activities: Activity[]) {
         this.activities = activities;
     }
 
-    async migrate() {
-        let client, collection, result = {success: false};
+    async migrate(): Promise<ServiceResult> {
+        let client: MongoClient,
+            collection: Collection,
+            result: ServiceResult = {success: false};
 
         try {
             [collection, client] = await DataBase.getCollection('activity');
@@ -23,5 +31,3 @@ class MigrateActivities {
         return result;
     }
 }
-
-module.exports = MigrateActivities;

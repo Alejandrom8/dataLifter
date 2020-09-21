@@ -72,11 +72,8 @@ class MapSubjects {
             cssSelector: 'td[width=51].nombre > span.grupo',
             html: html,
             filter: (element) => {
-                /*
-              let generic_link = element.children[1].attribs.href;
-                commented while the FCA website puts the links again
-                 */
-                let url = `${config_json_1.default.scraping.baseURLForWorkPlans}${''}`; /*here should be generic_link*/
+                let generic_link = element.children[1].attribs.href;
+                let url = `${config_json_1.default.scraping.baseURLForWorkPlans}${generic_link}`; /*here should be generic_link*/
                 return url;
             }
         };

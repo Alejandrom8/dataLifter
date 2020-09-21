@@ -1,15 +1,17 @@
-"use strict";
+import DataBase from '../DataBase';
+import Module from '../entities/Module';
+import { ServiceResult } from '../types';
 
-const DataBase = require('../DataBase');
+export default class MigrateModules {
 
-class MigrateModules {
+    private modules: Module[]
 
-    constructor(modules) {
+    constructor(modules: Module[]) {
         this.modules = modules;
     }
 
-    async migrate() {
-        let result = {success: false};
+    async migrate(): Promise<ServiceResult> {
+        let result: ServiceResult = {success: false};
 
         try {
             if(!this.modules.length) 
@@ -29,5 +31,3 @@ class MigrateModules {
         return result;
     }
 }
-
-module.exports = MigrateModules;

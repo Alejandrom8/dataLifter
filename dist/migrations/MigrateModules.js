@@ -8,7 +8,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const DataBase = require('../DataBase');
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const DataBase_1 = __importDefault(require("../DataBase"));
 class MigrateModules {
     constructor(modules) {
         this.modules = modules;
@@ -19,7 +23,7 @@ class MigrateModules {
             try {
                 if (!this.modules.length)
                     throw `The modules array is empty, pass migration`;
-                let [collection, client] = yield DataBase.getCollection('module');
+                let [collection, client] = yield DataBase_1.default.getCollection('module');
                 let insert = yield collection.insertMany(this.modules);
                 client.close();
                 if (!insert.result.ok)
@@ -34,5 +38,5 @@ class MigrateModules {
         });
     }
 }
-module.exports = MigrateModules;
+exports.default = MigrateModules;
 //# sourceMappingURL=MigrateModules.js.map

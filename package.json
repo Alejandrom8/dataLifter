@@ -18,7 +18,8 @@
     "crawler-request": "^1.2.2",
     "mongodb": "^3.5.9",
     "pdf-parse": "^1.1.1",
-    "request-promise": "^4.2.5"
+    "request-promise": "^4.2.5",
+    "stdio": "^2.1.1"
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.21",
