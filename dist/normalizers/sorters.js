@@ -1,16 +1,24 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.insertionSort = void 0;
-exports.insertionSort = subjects => {
-    let val, index;
+exports.sortSubjects = void 0;
+/**
+ *
+ * @param {[]} s
+ * @param {number} a
+ * @param {number} b
+ */
+function swap(s, a, b) {
+    let tmpVal = s[a];
+    s[a] = s[b];
+    s[b] = tmpVal;
+}
+exports.sortSubjects = subjects => {
     for (let i = 1; i < subjects.length; i++) {
-        val = subjects[i];
-        index = i;
-        while (index > 0 && parseInt(subjects[index - 1].key.number) > parseInt(val.key.number)) {
-            subjects[index] = subjects[index - 1];
-            index--;
+        let j = i;
+        while (j > 0 && parseInt(subjects[j].key.number) < parseInt(subjects[j - 1].key.number)) {
+            swap(subjects, j, j - 1);
+            j--;
         }
-        subjects[index] = val;
     }
     return subjects;
 };

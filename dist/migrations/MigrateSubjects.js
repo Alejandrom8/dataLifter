@@ -27,7 +27,8 @@ class MigrateSubjects {
     migrate() {
         return __awaiter(this, void 0, void 0, function* () {
             let result = { success: false };
-            let collection, client;
+            let collection;
+            let client;
             try {
                 [collection, client] = yield DataBase_1.default.getCollection('subject');
                 let insert = yield collection.insertMany(this.subjects);

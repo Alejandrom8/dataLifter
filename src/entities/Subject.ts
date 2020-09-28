@@ -1,5 +1,5 @@
-import Key from './Key';
-import { genRandomKey } from '../helpers/generators';
+import Key from './Key'
+import { genRandomKey } from '../helpers/generators'
 
 /**
  * creates a new Subject instance.
@@ -7,13 +7,13 @@ import { genRandomKey } from '../helpers/generators';
  */
 export default class Subject {
 
-    public subjectID: string;
-    public semesterID: number;
-    public name: string;
-    public key: Key;
-    public planDeTrabajoURL: string;
-    public apunteURL: string | string[];
-    public actividadesURL: string | string[];
+    public subjectID: string
+    public semesterID: number
+    public name: string
+    public key: Key
+    public planDeTrabajoURL: string
+    public apunteURL: string | string[]
+    public actividadesURL: string | string[]
     
     /**
      * @param {number} semesterID - the number of the semester to which this
@@ -31,17 +31,17 @@ export default class Subject {
      * PDF document of this subject. This one will only exists for the SUA 
      * education mode.
      */
-    constructor(
+    constructor (
         semesterID: number,
         name: string, 
         key: string, 
         planDeTrabajoURL: string = ''
     ) {
-        this.subjectID = genRandomKey();
-        this.semesterID = semesterID;
-        this.key = new Key(key);
-        this.name = name;
-        this.planDeTrabajoURL = planDeTrabajoURL;
+        this.subjectID = genRandomKey()
+        this.semesterID = semesterID
+        this.key = new Key(key)
+        this.name = name
+        this.planDeTrabajoURL = planDeTrabajoURL
     }
 
     /**
@@ -51,8 +51,8 @@ export default class Subject {
      * @param {String} actividadesURL - the URL for the actividades PDF for this
      * subject object.
      */
-    setMaterials(apunteURL: string | string[], actividadesURL: string | string[]) {
-        this.apunteURL = apunteURL;
-        this.actividadesURL = actividadesURL;
+    setMaterials (apunteURL: string | string[], actividadesURL: string | string[]) {
+        this.apunteURL = apunteURL
+        this.actividadesURL = actividadesURL
     }
 }

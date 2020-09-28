@@ -38,3 +38,14 @@ export interface PreModule {
     unidad: string
     actividades: Block[]
 }
+
+interface Filter {
+	(element: CheerioElement): string
+}
+
+export interface HTMLScrapConfig {
+	cssSelector: string
+	html: string
+	filter: Filter
+	steps?: {init: number, size: number}
+}

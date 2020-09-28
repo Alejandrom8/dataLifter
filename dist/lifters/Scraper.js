@@ -30,24 +30,13 @@ class Scraper {
     static scrap(URL, encoding = 'utf8') {
         return __awaiter(this, void 0, void 0, function* () {
             let result = yield new Promise((resolve, reject) => {
-                let config = { uri: URL, encoding: encoding };
-                request_promise_1.default(config)
+                request_promise_1.default({ uri: URL, encoding: encoding })
                     .then(html => resolve(html))
                     .catch(err => reject(err));
             });
             if (!result)
                 throw 'can not get the content of the specified url';
             return result;
-        });
-    }
-    /**
-     *
-     * @param {String} URL
-     */
-    static scrapPDF(URL) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let response = yield crawler_request_1.default(URL);
-            return response;
         });
     }
     /**
@@ -73,7 +62,8 @@ class Scraper {
     * the html.
     */
     static getElementsFromHTML({ cssSelector, html, filter, steps = { init: 0, size: 1 } }) {
-        let elements = cheerio_1.default(cssSelector, html), elementsFiltered = [];
+        let elements = cheerio_1.default(cssSelector, html);
+        let elementsFiltered = [];
         for (let i = steps.init; i < Object.keys(elements).length; i += steps.size) {
             if (typeof elements[i] == 'undefined')
                 continue;
@@ -83,4 +73,9 @@ class Scraper {
     }
 }
 exports.default = Scraper;
+/**
+ *
+ * @param {String} URL
+ */
+Scraper.scrapPDF = (URL) => __awaiter(void 0, void 0, void 0, function* () { return yield crawler_request_1.default(URL); });
 //# sourceMappingURL=Scraper.js.map

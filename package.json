@@ -4,7 +4,7 @@
   "description": "A lifter for the data from the FCA SUA website.",
   "main": "dist/index.js",
   "scripts": {
-    "start": "tsc && npm run globalMigration",
+    "start": "node dist/index.js",
     "build": "webpack",
     "test": "jest",
     "migrateSubjects": "node scripts/migrateSubjects.js",

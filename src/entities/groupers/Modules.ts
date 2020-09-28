@@ -1,9 +1,9 @@
-import {PreModule} from '../../types';
+import { PreModule } from '../../types'
 
 export default class Modules {
 
-    public subjectID: string;
-    public modulesList: PreModule[];
+    public subjectID: string
+    public modulesList: PreModule[]
 
     /**
      * 
@@ -11,8 +11,8 @@ export default class Modules {
      * this modules belongs.
      * @param {object[]} modules - an array of Module objects.
      */
-    constructor(subjectID: string, modules: PreModule[]) {
-        this.subjectID = subjectID;
-        this.modulesList = modules;
+    constructor (subjectID: string, modules: PreModule[]) {
+        this.subjectID = subjectID
+        this.modulesList = modules
     }
 }

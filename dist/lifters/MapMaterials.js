@@ -60,11 +60,14 @@ class MapMaterials {
      */
     processHTML(html) {
         //gettin the 'claves'. patron: center-left-center-center. [clave, nombre, apunte, actividades];
-        const generalSelector = `table.tablaamarilla > tbody tr >`, type_1 = `${generalSelector} td.tablaamarilla[valign="middle"][bgcolor="#E6E6E6"]`, type_2 = `${generalSelector} td.estilos[valign="middle"][bgcolor="#E6E6E6"]`, selector = `${type_1}, ${type_2}`;
+        const generalSelector = `table.tablaamarilla > tbody tr >`;
+        const type_1 = `${generalSelector} td.tablaamarilla[valign="middle"][bgcolor="#E6E6E6"]`;
+        const type_2 = `${generalSelector} td.estilos[valign="middle"][bgcolor="#E6E6E6"]`;
+        const selector = `${type_1}, ${type_2}`;
         let stringElements = this.getElementsFromHTML(selector, html);
         let subjectMaterials = this.groupMaterials(stringElements);
         subjectMaterials = this.checkSimilarSubjects(subjectMaterials);
-        subjectMaterials = sorters_1.insertionSort(subjectMaterials);
+        subjectMaterials = sorters_1.sortSubjects(subjectMaterials);
         return subjectMaterials;
     }
     /**
@@ -76,12 +79,13 @@ class MapMaterials {
      * filters.
      */
     getElementsFromHTML(cssSelector, html) {
-        var _a, _b, _c, _d;
+        var _a, _b, _c, _d, _e, _f;
         const htmlElements = cheerio_1.default(cssSelector, html);
-        let elementsFiltered = [], linkCounter = 0;
+        let elementsFiltered = [];
+        let linkCounter = 0;
         let current;
         for (let i = 0; i < htmlElements.length; i++) {
-            if (typeof htmlElements[i] == 'undefined')
+            if (typeof htmlElements[i] === 'undefined')
                 continue;
             current = htmlElements[i].children[0];
             /*if the element is a colspan of two and have the indicated text,
@@ -95,24 +99,16 @@ class MapMaterials {
                     continue;
                 }
             }
-            if ('attribs' in htmlElements[i] &&
-                'colspan' in htmlElements[i].attribs) {
-                if (htmlElements[i].attribs.colspan === '2') {
-                    elementsFiltered.push(current.data);
-                    elementsFiltered.push(current.data);
-                    linkCounter = 0;
-                    continue;
-                }
+            if (((_b = (_a = htmlElements[i]) === null || _a === void 0 ? void 0 : _a.attribs) === null || _b === void 0 ? void 0 : _b.colspan) === '2') {
+                elementsFiltered.push(current.data);
+                elementsFiltered.push(current.data);
+                linkCounter = 0;
+                continue;
             }
             //if('children' in current) { //if the element is a Video clase, skip it
-            if (((_a = current.children) === null || _a === void 0 ? void 0 : _a.length) > 0) {
-                if ('attribs' in current.children[0]) {
-                    if ('alt' in ((_b = current.children[0]) === null || _b === void 0 ? void 0 : _b.attribs)) {
-                        if (((_d = (_c = current.children[0]) === null || _c === void 0 ? void 0 : _c.attribs) === null || _d === void 0 ? void 0 : _d.alt) === 'Video Clase') {
-                            continue;
-                        }
-                    }
-                }
+            if (((_c = current.children) === null || _c === void 0 ? void 0 : _c.length) > 0) {
+                if (((_e = (_d = current.children[0]) === null || _d === void 0 ? void 0 : _d.attribs) === null || _e === void 0 ? void 0 : _e.alt) === 'Video Clase')
+                    continue;
             }
             //}
             if (linkCounter >= 2) { //apply this for elements in count 23 67 1011
@@ -121,16 +117,18 @@ class MapMaterials {
                     elementsFiltered.push(null);
                     continue;
                 }
-                elementsFiltered.push(this.baseURL + current.attribs.href);
+                elementsFiltered.push(this.baseURL + ((_f = current === null || current === void 0 ? void 0 : current.attribs) === null || _f === void 0 ? void 0 : _f.href));
             }
             else {
-                if (current.name === 'p') { //if element has p children even text
+                //if element has p children even text
+                if (current.name === 'p')
                     current = current.children[0];
-                }
                 elementsFiltered.push(current.data);
             }
             //to determine when a block of 4 is done
-            linkCounter = linkCounter === 3 ? 0 : linkCounter + 1;
+            linkCounter = linkCounter === 3
+                ? 0
+                : ++linkCounter;
         }
         return elementsFiltered;
     }
@@ -140,7 +138,11 @@ class MapMaterials {
      * @returns {Material[]}
      */
     groupMaterials(subjects) {
-        let sorted = [], clave, apunteURL, actividadesURL, material;
+        let sorted = [];
+        let clave;
+        let apunteURL;
+        let actividadesURL;
+        let material;
         for (let i = 0; i < subjects.length; i += 4) {
             clave = typeof subjects[i] == 'undefined' ? subjects[i + 1] : subjects[i];
             clave = (clave.replace(/(^\s*(?!.+)\n+)|(\n+\s+(?!.+)$)/g, "")).trim();
@@ -157,11 +159,13 @@ class MapMaterials {
         let generalRoundSubjectsChecked = [];
         let final = [];
         let additionalIndexes = ['a', 'c', 'i'];
-        const getCoincidences = i => withoutModifications.filter((sub, index) => {
+        const getCoincidences = (i) => withoutModifications.filter((sub, index) => {
             if (withoutModifications[i].key.number === sub.key.number)
                 checked.push(index);
             return withoutModifications[i].key.number === sub.key.number;
-        }), subjectIsChecked = (id) => generalRoundSubjectsChecked.indexOf(id), tagCoincidences = coincidences => (coincidences.map((c, index) => {
+        });
+        const subjectIsChecked = id => generalRoundSubjectsChecked.indexOf(id);
+        const tagCoincidences = coincidences => (coincidences.map((c, index) => {
             c.key.letter = additionalIndexes[index];
             return c;
         }));

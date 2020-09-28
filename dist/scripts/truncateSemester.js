@@ -15,49 +15,36 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const DataBase_1 = __importDefault(require("../DataBase"));
 const stdio_1 = require("stdio");
 const config_json_1 = __importDefault(require("../config.json"));
-/**
- * script para borrar todos los datos de un semestre en especifico
- */
 const levels = [
     { collection: 'subject', identifier: 'semesterID' },
     { collection: 'module', identifier: 'subjectID' },
     { collection: 'activity', identifier: 'moduleID' }
 ];
 const RESULTS = { subject: [], module: [], activity: [] };
-(function main() {
+/**
+ * script para borrar todos los datos de un semestre en especifico
+ */
+function truncateSemster(SEMESTER) {
     return __awaiter(this, void 0, void 0, function* () {
-        let SEMESTER, isValid = false;
-        do {
-            SEMESTER = yield stdio_1.ask("What semester do you want to delete? ");
-            isValid = semesterIsValid(SEMESTER);
-            if (!isValid)
-                console.log("The introduced semester is not valid, try again with other value");
-        } while (!isValid);
-        console.log("Searching all references for semester " + SEMESTER);
+        console.log('Searching all references for semester ' + SEMESTER);
         yield findReferences([parseInt(SEMESTER)]);
-        console.log("Attempting to delete the following resources: ");
+        console.log('Attempting to delete the following resources: ');
         console.log(`---Subjects: ${RESULTS.subject.length}`);
         console.log(`---Modules: ${RESULTS.module.length}`);
         console.log(`---Activities: ${RESULTS.activity.length}`);
-        let proceed = (yield stdio_1.ask("Do you want to proceed? (Y/n) ")).toLowerCase();
+        let proceed = (yield stdio_1.ask('Do you want to proceed? (Y/n) ')).toLowerCase();
         if (proceed === 'n') {
-            console.log("Aborted...");
+            console.log('Aborted...');
             return;
         }
         let size = RESULTS.subject.length + RESULTS.module.length + RESULTS.activity.length;
         let progress = new stdio_1.ProgressBar(99, { tickSize: 33 });
         console.log(`Deleting ${size} resources`);
         yield deleteAllReferences(RESULTS, progress);
-        console.log("Program finished");
+        console.log('Program finished');
     });
-})();
-function semesterIsValid(semester) {
-    if (!(semester = parseInt(semester)))
-        return false;
-    if (semester > 9 || semester < 1)
-        return false;
-    return true;
 }
+exports.default = truncateSemster;
 function findReferences(idValues, level = 0) {
     return __awaiter(this, void 0, void 0, function* () {
         if (level === levels.length - 1) {
@@ -84,9 +71,9 @@ function getAllReferences(values, collectionName, { identifier }) {
 }
 function getIds(collectionName, { identifier, idValue }) {
     return __awaiter(this, void 0, void 0, function* () {
-        let client, collection;
-        let querier = {};
-        querier[identifier] = idValue;
+        let client;
+        let collection;
+        let querier = { [identifier]: idValue };
         try {
             [collection, client] = yield DataBase_1.default.getCollection(collectionName);
             let query = yield new Promise((resolve, reject) => {
@@ -112,14 +99,21 @@ function getIds(collectionName, { identifier, idValue }) {
 function deleteAllReferences(results, bar) {
     return __awaiter(this, void 0, void 0, function* () {
         let { subjectQuery, moduleQuery, activityQuery } = prepareQueries(results);
-        let collection, client;
+        let collection;
+        let client;
         try {
             [collection, client] = yield DataBase_1.default.getCollection('activity');
             yield collection.deleteMany({ $or: activityQuery });
             bar.tick();
-            yield client.db(config_json_1.default.database.mongodb.db).collection('module').deleteMany({ $or: moduleQuery });
+            yield client
+                .db(config_json_1.default.database.mongodb.db)
+                .collection('module')
+                .deleteMany({ $or: moduleQuery });
             bar.tick();
-            yield client.db(config_json_1.default.database.mongodb.db).collection('subject').deleteMany({ $or: subjectQuery });
+            yield client
+                .db(config_json_1.default.database.mongodb.db)
+                .collection('subject')
+                .deleteMany({ $or: subjectQuery });
             bar.tick();
         }
         catch (error) {
@@ -131,11 +125,10 @@ function deleteAllReferences(results, bar) {
     });
 }
 function prepareQueries(results) {
-    let result = {
+    return {
         subjectQuery: results.subject.map(s => ({ subjectID: s })),
         moduleQuery: results.module.map(m => ({ moduleID: m })),
         activityQuery: results.activity.map(a => ({ activityID: a }))
     };
-    return result;
 }
-//# sourceMappingURL=truncate.js.map
+//# sourceMappingURL=truncateSemester.js.map

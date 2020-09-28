@@ -1,4 +1,4 @@
-import Key from './Key';
+import Key from './Key'
 
 /**
  * creates an instance of the Material class.
@@ -6,9 +6,9 @@ import Key from './Key';
  */
 export default class Material {
 
-    public key: Key;
-    public apunteURL: string;
-    public actividadesURL: string;
+    public key: Key
+    public apunteURL: string
+    public actividadesURL: string
     
     /**
      * 
@@ -19,9 +19,9 @@ export default class Material {
      * @param { URL } actividadesURL - the URL to the actividades PDF online
      * file for this bunch of materials.
      */
-    constructor(key: string, apunteURL: string, actividadesURL: string) {
-        this.key = new Key(key);
-        this.apunteURL = apunteURL;
-        this.actividadesURL = actividadesURL;
+    constructor (key: string, apunteURL: string, actividadesURL: string) {
+        this.key = new Key(key)
+        this.apunteURL = apunteURL
+        this.actividadesURL = actividadesURL
     }
 }

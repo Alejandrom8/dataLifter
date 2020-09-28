@@ -1,15 +1,23 @@
-export const insertionSort = subjects => {
-    let val, index;
+/**
+ * 
+ * @param {[]} s 
+ * @param {number} a 
+ * @param {number} b 
+ */
+function swap(s, a, b) {
+    let tmpVal = s[a]
+    s[a] = s[b]
+    s[b] = tmpVal
+}
 
-    for(let i = 1; i < subjects.length; i++) {
-        val = subjects[i];
-        index = i;
-        while(index > 0 && parseInt(subjects[index-1].key.number) > parseInt(val.key.number)){
-            subjects[index] = subjects[index-1];
-            index--;
+export const sortSubjects = subjects => {
+    for (let i = 1; i < subjects.length; i++) {
+        let j = i
+        while (j > 0 && parseInt(subjects[j].key.number) < parseInt(subjects[j-1].key.number)) {
+            swap(subjects, j, j-1)
+            j--
         }
-        subjects[index] = val;
     }
 
-    return subjects;
+    return subjects
 }

@@ -18,11 +18,11 @@ class Tagger {
      * @returns {[][]}
      */
     getSeparatedModulesAndActivities() {
-        let taggedModules = [], taggedActivities = [];
-        this.modules.modulesList.forEach((module, moduleIndex) => {
+        let taggedActivities = [];
+        let taggedModules = this.modules.modulesList.map((module, moduleIndex) => {
             let tm = new Module_1.default(this.modules.subjectID, module.unidad, moduleIndex);
-            taggedModules.push(tm);
             taggedActivities.push(...this.getSeparatedActivities(tm.moduleID, module.actividades));
+            return tm;
         });
         return [taggedModules, taggedActivities];
     }
@@ -32,9 +32,7 @@ class Tagger {
      * @param {[]} activities
      */
     getSeparatedActivities(moduleID, activities) {
-        return activities.map((act, actIndex) => {
-            return new Activity_1.default(moduleID, act.text, actIndex, act.actividad);
-        });
+        return activities.map((act, actIndex) => (new Activity_1.default(moduleID, act.text, actIndex, act.actividad)));
     }
 }
 exports.default = Tagger;

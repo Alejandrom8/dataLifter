@@ -19,7 +19,9 @@ class MigrateActivities {
     }
     migrate() {
         return __awaiter(this, void 0, void 0, function* () {
-            let client, collection, result = { success: false };
+            let client;
+            let collection;
+            let result = { success: false };
             try {
                 [collection, client] = yield DataBase_1.default.getCollection('activity');
                 let insert = yield collection.insertMany(this.activities);
