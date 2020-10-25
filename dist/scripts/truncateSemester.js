@@ -27,7 +27,7 @@ const RESULTS = { subject: [], module: [], activity: [] };
 function truncateSemster(SEMESTER) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log('Searching all references for semester ' + SEMESTER);
-        yield findReferences([parseInt(SEMESTER)]);
+        yield findReferences([SEMESTER]);
         console.log('Attempting to delete the following resources: ');
         console.log(`---Subjects: ${RESULTS.subject.length}`);
         console.log(`---Modules: ${RESULTS.module.length}`);
@@ -38,9 +38,8 @@ function truncateSemster(SEMESTER) {
             return;
         }
         let size = RESULTS.subject.length + RESULTS.module.length + RESULTS.activity.length;
-        let progress = new stdio_1.ProgressBar(99, { tickSize: 33 });
         console.log(`Deleting ${size} resources`);
-        yield deleteAllReferences(RESULTS, progress);
+        yield deleteAllReferences();
         console.log('Program finished');
     });
 }
@@ -96,25 +95,22 @@ function getIds(collectionName, { identifier, idValue }) {
         }
     });
 }
-function deleteAllReferences(results, bar) {
+function deleteAllReferences() {
     return __awaiter(this, void 0, void 0, function* () {
-        let { subjectQuery, moduleQuery, activityQuery } = prepareQueries(results);
-        let collection;
+        let { subjectQuery, moduleQuery, activityQuery } = prepareQueries(RESULTS);
         let client;
+        let collection;
         try {
             [collection, client] = yield DataBase_1.default.getCollection('activity');
             yield collection.deleteMany({ $or: activityQuery });
-            bar.tick();
             yield client
                 .db(config_json_1.default.database.mongodb.db)
                 .collection('module')
                 .deleteMany({ $or: moduleQuery });
-            bar.tick();
             yield client
                 .db(config_json_1.default.database.mongodb.db)
                 .collection('subject')
                 .deleteMany({ $or: subjectQuery });
-            bar.tick();
         }
         catch (error) {
             console.log(error);

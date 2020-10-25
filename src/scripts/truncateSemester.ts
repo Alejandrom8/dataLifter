@@ -1,21 +1,31 @@
-import DataBase from '../DataBase';
-import {ask, ProgressBar} from 'stdio';
-import config from '../config.json';
+import DataBase from '../DataBase'
+import { ask } from 'stdio'
+import config from '../config.json'
+import Subject from '../entities/Subject'
+import Module from '../entities/Module'
+import Activity from '../entities/Activity'
+import { Collection, MongoClient } from 'mongodb'
+
+interface RESULTS {
+    subject: Subject[]
+    module: Module[]
+    activity: Activity[]
+}
 
 const levels = [
     { collection: 'subject', identifier: 'semesterID' },
     { collection: 'module', identifier: 'subjectID' },
     { collection: 'activity', identifier: 'moduleID' }
 ]
-const RESULTS = { subject: [], module:[], activity: [] }
+const RESULTS: RESULTS = { subject: [], module:[], activity: [] }
 
 /**
  * script para borrar todos los datos de un semestre en especifico
  */
-export default async function truncateSemster (SEMESTER) {
+export default async function truncateSemster (SEMESTER: number) {
     console.log('Searching all references for semester ' + SEMESTER)
 
-    await findReferences([parseInt(SEMESTER)])
+    await findReferences([SEMESTER])
 
     console.log('Attempting to delete the following resources: ')
     console.log(`---Subjects: ${RESULTS.subject.length}`)
@@ -30,29 +40,39 @@ export default async function truncateSemster (SEMESTER) {
     }
 
     let size = RESULTS.subject.length + RESULTS.module.length + RESULTS.activity.length
-    let progress = new ProgressBar(99, {tickSize: 33})
+
     console.log(`Deleting ${size} resources`)
-    await deleteAllReferences(RESULTS, progress)
+
+    await deleteAllReferences()
+
     console.log('Program finished')
 }
 
-async function findReferences(idValues, level = 0) {
-    if (level === levels.length -1) {
+async function findReferences (
+    idValues: (string | number)[], 
+    level: number = 0
+) {
+    if (level === levels.length - 1) {
         return await getAllReferences(
             idValues, 
             levels[level].collection, 
-            {identifier: levels[level].identifier}
+            { identifier: levels[level].identifier }
         )
     } else {
-        await findReferences(await getAllReferences(
-            idValues,
-            levels[level].collection,
-            {identifier: levels[level].identifier}
-        ), level + 1)
+        await findReferences(
+            await getAllReferences(
+                idValues,
+                levels[level].collection,
+                {identifier: levels[level].identifier}
+            )
+        , level + 1)
     }
 }
 
-async function getAllReferences (values, collectionName, { identifier }) {
+async function getAllReferences (
+    values: (string | number)[], 
+    collectionName: string, { identifier }
+) {
     let references = []
     for (let id of values) {
         let data = await getIds(collectionName, {
@@ -65,14 +85,18 @@ async function getAllReferences (values, collectionName, { identifier }) {
     return references
 }
 
-async function getIds (collectionName, { identifier, idValue }) {
-    let client
-    let collection
+async function getIds (
+    collectionName: string, 
+    { identifier, idValue }
+): Promise<string[]> {
+    let client: MongoClient
+    let collection: Collection
     let querier = { [identifier]: idValue }
 
     try {
         [collection, client] = await DataBase.getCollection(collectionName)
-        let query = await new Promise( (resolve, reject) => {
+
+        let query: string[] = await new Promise( (resolve, reject) => {
             collection.find(querier).toArray((error, data) => {
                 if(error) reject(error)
                 data = data.map(element => (
@@ -81,6 +105,7 @@ async function getIds (collectionName, { identifier, idValue }) {
                 resolve(data)
             })
         })
+
         if(!query) throw 'there are no results for this query'
 
         return query
@@ -91,29 +116,26 @@ async function getIds (collectionName, { identifier, idValue }) {
     }
 }
 
-async function deleteAllReferences (results, bar) {
+async function deleteAllReferences () {
     let { 
         subjectQuery, 
         moduleQuery, 
         activityQuery 
-    } = prepareQueries(results)
-    let collection
-    let client
+    } = prepareQueries(RESULTS)
+    let client: MongoClient
+    let collection: Collection
 
     try {
         [collection, client] = await DataBase.getCollection('activity')
         await collection.deleteMany({ $or: activityQuery })
-        bar.tick()
         await client
                 .db(config.database.mongodb.db)
                 .collection('module')
                 .deleteMany({ $or: moduleQuery })
-        bar.tick()
         await client
                 .db(config.database.mongodb.db)
                 .collection('subject')
                 .deleteMany({ $or: subjectQuery })
-        bar.tick();
     } catch (error) {
         console.log(error)
     } finally {
@@ -121,7 +143,7 @@ async function deleteAllReferences (results, bar) {
     }
 }
 
-function prepareQueries (results) {
+function prepareQueries (results: RESULTS) {
     return {
         subjectQuery: results.subject.map(s => ({ subjectID: s })),
         moduleQuery: results.module.map(m => ({ moduleID: m })),

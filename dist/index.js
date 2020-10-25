@@ -25,19 +25,21 @@ const options = ['semester migration', 'truncate semester', 'exit'];
             switch (selectedoption) {
                 case 1:
                     yield performSemesterMigration();
+                    yield stdio_1.ask('\npress any key to proceed');
                     break;
                 case 2:
                     yield performTruncateSemester();
+                    yield stdio_1.ask('\npress any key to proceed');
                     break;
                 case options.length:
-                    console.log('Program finished...');
-                    return;
+                    break;
                 default:
                     console.log('Incorrect option');
                     break;
             }
-            yield stdio_1.ask('\npress any key to proceed');
         } while (selectedoption !== options.length);
+        console.log('Program finished...');
+        return Promise.resolve();
     });
 })();
 /**
@@ -48,13 +50,11 @@ function askOption() {
     return __awaiter(this, void 0, void 0, function* () {
         console.log('\n  Menu');
         options.forEach((opt, i) => console.log(`  ${i + 1}. ${opt}.`));
-        return parseInt(yield stdio_1.ask('\nWhich option do you want to perform? '));
+        return parseInt(yield stdio_1.ask('\nWhich option do you want to perform?'));
     });
 }
 function semesterIsValid(semester) {
-    if (!semester || semester > 9 || semester < 1)
-        return false;
-    return true;
+    return !(!semester || semester > 9 || semester < 1);
 }
 function performSemesterMigration() {
     return __awaiter(this, void 0, void 0, function* () {

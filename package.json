@@ -5,11 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js",
-    "build": "webpack",
-    "test": "jest",
-    "migrateSubjects": "node scripts/migrateSubjects.js",
-    "migrateActivities": "node scripts/migrateActivities.js",
-    "globalMigration": "node dist/scripts/globalMigration.js"
+    "build": "tsc",
+    "test": "jest"
   },
   "author": "Alejandro Gómez García <alejandro.originx@gmail.com>",
   "license": "ISC",

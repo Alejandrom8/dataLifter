@@ -3,6 +3,9 @@ import ModulesCreator from '../creators/Modules.creator'
 import MigrateSubjects from '../migrations/MigrateSubjects'
 import MigrateModules from '../migrations/MigrateModules'
 import MigrateActivities from '../migrations/MigrateActivities'
+import Module from '../entities/Module'
+import Activity from '../entities/Activity'
+import Subject from '../entities/Subject'
 
 /**
  * This function should create the records into the FCA database for the
@@ -12,7 +15,7 @@ import MigrateActivities from '../migrations/MigrateActivities'
  * 3. migrate subjects
  * 4. migrate modules and activities
  */
-export default async function semesterMigration (SEMESTER) {
+export default async function semesterMigration (SEMESTER: number) {
     const start = Date.now() //counting execution time
 
     //getting subjects for indicated semester.
@@ -40,7 +43,7 @@ export default async function semesterMigration (SEMESTER) {
  * 
  * @param {} subjects 
  */
-async function createModulesAndActivities (subjects) {
+async function createModulesAndActivities (subjects: Subject[]): Promise<[Module[], Activity[]]> {
     let modulesToMigrate = []
     let activitiesToMigrate = []
 
