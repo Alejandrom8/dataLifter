@@ -39,8 +39,9 @@ class Joiner {
         //ISSUE - cuando en pt se especifica una letra fuera de orden [a, c, i], 
         //en materialsList se genera otra deacuerdo al orden en el que se leen 
         //las materias, lo que hace que no matche en ningun elemento.
-        let apuntes = [], actividades = [];
-        if (typeof key.letter == 'string' && key.conciderLetter) {
+        let apuntes = [];
+        let actividades = [];
+        if (key.conciderLetter && typeof key.letter == 'string') {
             for (let i = 0; i < materialsList.length; i++) {
                 if (materialsList[i].key.number === key.number &&
                     materialsList[i].key.letter === key.letter) {

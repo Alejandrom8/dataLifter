@@ -1,5 +1,5 @@
-import MapModules from '../lifters/MapModules';
-import Tagger from '../normalizers/Tagger';
+import MapModules from '../lifters/MapModules'
+import Tagger from '../normalizers/Tagger'
 
 /**
  * ModulesCreator its a "creator" for Module and Activity objects, it's simple
@@ -9,9 +9,9 @@ import Tagger from '../normalizers/Tagger';
  */
 export default class ModulesCreator {
 
-    public semesterID: number;
-    public subjectID: string;
-    public subjectPDF: string;
+    public semesterID: number
+    public subjectID: string
+    public subjectPDF: string
 
     /**
      * 
@@ -22,14 +22,14 @@ export default class ModulesCreator {
      * @param {String} param0.planDeTrabajoURL - the URL from where will be taken the
      * data for the modules and activities.
      */
-    constructor({semesterID, subjectID, planDeTrabajoURL} : {
+    constructor ({ semesterID, subjectID, planDeTrabajoURL } : {
         semesterID: number,
         subjectID: string,
         planDeTrabajoURL: string
     }) {
-        this.semesterID = semesterID;
-        this.subjectID = subjectID;
-        this.subjectPDF = planDeTrabajoURL;
+        this.semesterID = semesterID
+        this.subjectID = subjectID
+        this.subjectPDF = planDeTrabajoURL
     }
 
     /**
@@ -37,18 +37,18 @@ export default class ModulesCreator {
      * uploaded to the database.
      * @returns {Promise<{modules: object[], activities: object[]}>}
      */
-    public async createModules(): Promise<{modules: object[], activities: object[]}> {
+    public async createModules (): Promise<{modules: object[], activities: object[]}> {
         let map_manager = new MapModules(
             this.semesterID, 
             this.subjectID, 
             this.subjectPDF
-        );
-        let modules = await map_manager.formGroups();
-        let tag_manager = new Tagger(modules);
+        )
+        let modules = await map_manager.formGroups()
+        let tag_manager = new Tagger(modules)
         let [
             taggedModules, 
             taggedActivities
-        ] = tag_manager.getSeparatedModulesAndActivities();
+        ] = tag_manager.getSeparatedModulesAndActivities()
 
         return {
             modules: taggedModules,

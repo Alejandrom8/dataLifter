@@ -1,4 +1,4 @@
-import { genRandomKey } from '../helpers/generators';
+import { genRandomKey } from '../helpers/generators'
 
 /**
  * creates an instance of an Activity object.
@@ -6,11 +6,11 @@ import { genRandomKey } from '../helpers/generators';
  */
 export default class Activity {
 
-    public activityID: string;
-    public moduleID: string;
-    public content: string;
-    public index: number;
-    public activityTitle: string;
+    public activityID: string
+    public moduleID: string
+    public content: string
+    public index: number
+    public activityTitle: string
     
     /**
      * 
@@ -22,11 +22,11 @@ export default class Activity {
      * module.
      * @param {String} activityTitle - the index read from the pdf for this activity.
      */
-    constructor(moduleID: string, content: string, index: number, activityTitle: string) {
-        this.activityID = genRandomKey();
-        this.moduleID = moduleID;
-        this.content = content;
-        this.index = index;
-        this.activityTitle = activityTitle;
+    constructor (moduleID: string, content: string, index: number, activityTitle: string) {
+        this.activityID = genRandomKey()
+        this.moduleID = moduleID
+        this.content = content
+        this.index = index
+        this.activityTitle = activityTitle
     }
 }

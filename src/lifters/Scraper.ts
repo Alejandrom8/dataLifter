@@ -1,17 +1,7 @@
-import rp from 'request-promise';
-import $ from 'cheerio';
-import crawler from 'crawler-request';
-
-interface Filter {
-	(element: CheerioElement): string
-}
-
-interface HTMLScrapConfig {
-	cssSelector: string
-	html: string
-	filter: Filter
-	steps?: {init: number, size: number}
-}
+import rp from 'request-promise'
+import $ from 'cheerio'
+import crawler from 'crawler-request'
+import { HTMLScrapConfig } from '../types'
 
 /**
  * groups a bounch of functions that help to make web scrapping
@@ -25,25 +15,21 @@ export default class Scraper {
 	*   the returned content.
 	*	@returns {Promise} the html of the consulted url.
 	*/
-	public static async scrap(URL: string, encoding: string = 'utf8'): Promise<string> {
+	public static async scrap (URL: string, encoding: string = 'utf8'): Promise<string> {
 		let result: string = await new Promise((resolve, reject) => {
-			let config = {uri: URL, encoding: encoding};
-			rp(config)
+			rp({ uri: URL, encoding: encoding })
 				.then( html => resolve(html))
-				.catch( err => reject(err));
-		});
-		if(!result) throw 'can not get the content of the specified url';
-		return result;
-    }
+				.catch( err => reject(err))
+		})
+		if(!result) throw 'can not get the content of the specified url'
+		return result
+  }
 
 	/**
 	 * 
-	 * @param {String} URL 
+	 * @param {String} URL
 	 */
-	public static async scrapPDF(URL: string) {
-		let response = await crawler(URL);
-		return response;
-	}
+	public static scrapPDF = async (URL: string) => await crawler(URL)
 
 	/**
 	* this function should determine if an html line is valid or not.
@@ -68,20 +54,20 @@ export default class Scraper {
 	* @returns {Array} - an array with the selected and filtered elements from 
 	* the html.
 	*/
-    static getElementsFromHTML({
+  static getElementsFromHTML({
 		cssSelector,
 		html,
 		filter,
-		steps = {init: 0, size: 1}
+		steps = { init: 0, size: 1 }
 	}: HTMLScrapConfig): string[] {
-        let elements = $(cssSelector, html),
-            elementsFiltered = [];
+		let elements = $(cssSelector, html)
+		let elementsFiltered = []
 
-        for (let i = steps.init; i < Object.keys(elements).length; i += steps.size) {
-            if(typeof elements[i] == 'undefined') continue;
-            elementsFiltered.push(filter(elements[i]));
-        }
+		for (let i = steps.init; i < Object.keys(elements).length; i += steps.size) {
+				if (typeof elements[i] == 'undefined') continue
+				elementsFiltered.push(filter(elements[i]))
+		}
 
-        return elementsFiltered;
-    }
+		return elementsFiltered
+  }
 }

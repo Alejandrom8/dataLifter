@@ -1,7 +1,7 @@
 import Module from '../entities/Module';
 import Activity from '../entities/Activity';
 import Modules from '../entities/groupers/Modules';
-import {Block} from '../types';
+import { Block } from '../types';
 
 export default class Tagger {
 
@@ -11,32 +11,30 @@ export default class Tagger {
      * 
      * @param {Modules} modules 
      */
-    constructor(modules: Modules) {
-        this.modules = modules;
+    constructor (modules: Modules) {
+        this.modules = modules
     }
 
     /**
      *
      * @returns {[][]}
      */
-    getSeparatedModulesAndActivities(): (Module[] | Activity[])[] {
-        let taggedModules = [], taggedActivities = [];
-
-        this.modules.modulesList.forEach( (module, moduleIndex) => {
+    getSeparatedModulesAndActivities (): [Module[], Activity[]] {
+        let taggedActivities = []
+        let taggedModules = this.modules.modulesList.map( (module, moduleIndex) => {
             let tm = new Module(
                 this.modules.subjectID,
                 module.unidad,
                 moduleIndex
-            );
-
-            taggedModules.push(tm);
+            )
 
             taggedActivities.push(
                 ...this.getSeparatedActivities(tm.moduleID, module.actividades)
-            );
+            )
+            return tm
         });
         
-        return [taggedModules, taggedActivities];
+        return [taggedModules, taggedActivities]
     }
 
     /**
@@ -44,15 +42,15 @@ export default class Tagger {
      * @param {String} moduleID
      * @param {[]} activities
      */
-    getSeparatedActivities(moduleID: string, activities: Block[]): Activity[] {
-        return activities.map( (act, actIndex: number) => {
-            return new Activity(
+    getSeparatedActivities (moduleID: string, activities: Block[]): Activity[] {
+        return activities.map( (act, actIndex: number) => (
+            new Activity(
                 moduleID,
                 act.text,
                 actIndex,
                 act.actividad
             )
-        });
+        ))
     }
 }
 

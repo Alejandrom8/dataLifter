@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,16 +8,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const DataBase = require('../DataBase');
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const DataBase_1 = __importDefault(require("../DataBase"));
 class MigrateActivities {
     constructor(activities) {
         this.activities = activities;
     }
     migrate() {
         return __awaiter(this, void 0, void 0, function* () {
-            let client, collection, result = { success: false };
+            let client;
+            let collection;
+            let result = { success: false };
             try {
-                [collection, client] = yield DataBase.getCollection('activity');
+                [collection, client] = yield DataBase_1.default.getCollection('activity');
                 let insert = yield collection.insertMany(this.activities);
                 if (!insert.result.ok)
                     throw 'No se logro insertar el dato';
@@ -33,5 +40,5 @@ class MigrateActivities {
         });
     }
 }
-module.exports = MigrateActivities;
+exports.default = MigrateActivities;
 //# sourceMappingURL=MigrateActivities.js.map

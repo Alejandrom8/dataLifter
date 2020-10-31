@@ -5,10 +5,10 @@
  */
 export default class Key {
 
-    public key: string;
-    public number: string;
-    public letter: string;
-    public conciderLetter: boolean;
+    public key: string
+    public number: string
+    public letter: string
+    public conciderLetter: boolean
     
     /**
      * 
@@ -21,11 +21,11 @@ export default class Key {
      * -The letter at the end (the fifth element) is the initial letter of the
      * -career that owns this subject.
      */
-    constructor(key: string) {
-        this.key = key;
-        this.number = this.key.split('').slice(0, 4).join('');
-        this.letter = this.key[4] || null;
-        this.conciderLetter = false; /*if is important to consider the letter to
+    constructor (key: string) {
+        this.key = key
+        this.number = this.key.split('').slice(0, 4).join('')
+        this.letter = this.key[4] || null
+        this.conciderLetter = false /*if is important to consider the letter to
         classify this subject*/
     }
 }

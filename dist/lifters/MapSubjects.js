@@ -34,8 +34,8 @@ class MapSubjects {
                 const pageContent = yield Scraper_1.default.scrap(url, 'latin1');
                 let asignaturas = this.processHTML(pageContent);
                 if (!asignaturas)
-                    throw "Hubo un error al completar las asignaturas";
-                asignaturas = sorters_1.insertionSort(asignaturas);
+                    throw 'Hubo un error al completar las asignaturas';
+                asignaturas = sorters_1.sortSubjects(asignaturas);
                 result.data = asignaturas;
                 result.success = true;
             }
@@ -72,21 +72,19 @@ class MapSubjects {
             cssSelector: 'td[width=51].nombre > span.grupo',
             html: html,
             filter: (element) => {
-                /*
-              let generic_link = element.children[1].attribs.href;
-                commented while the FCA website puts the links again
-                 */
-                let url = `${config_json_1.default.scraping.baseURLForWorkPlans}${''}`; /*here should be generic_link*/
-                return url;
+                var _a, _b;
+                let generic_link = (_b = (_a = element === null || element === void 0 ? void 0 : element.children[1]) === null || _a === void 0 ? void 0 : _a.attribs) === null || _b === void 0 ? void 0 : _b.href;
+                return config_json_1.default.scraping.baseURLForWorkPlans + generic_link; /*here should be generic_link*/
             }
         };
-        let subjectNames = Scraper_1.default.getElementsFromHTML(subjectElementsClassifier), keys = Scraper_1.default.getElementsFromHTML(keyElementsClassifier), urls = Scraper_1.default.getElementsFromHTML(urlsElementsClassifier);
+        let subjectNames = Scraper_1.default.getElementsFromHTML(subjectElementsClassifier);
+        let keys = Scraper_1.default.getElementsFromHTML(keyElementsClassifier);
+        let urls = Scraper_1.default.getElementsFromHTML(urlsElementsClassifier);
         if (subjectNames.length !== keys.length || subjectNames.length !== urls.length) {
-            throw "There was a problem while trying to process the specified html";
+            throw 'There was a problem while trying to process the specified html';
         }
         let asignaturas = this.classifySubjects(subjectNames, keys, urls);
-        asignaturas = this.mapImportance(asignaturas);
-        return asignaturas;
+        return this.mapImportance(asignaturas);
     }
     /**
      * Groups the extracted info from processHTML into Subject objects.
@@ -99,7 +97,7 @@ class MapSubjects {
      */
     classifySubjects(names, keys, pt_urls) {
         let subjects = [];
-        for (let subjectIndex = 0; subjectIndex < names.length; subjectIndex++) {
+        for (let subjectIndex in names) {
             let subject = new Subject_1.default(this.semesterID, names[subjectIndex], (keys[subjectIndex]
                 .replace(/(^\s*(?!.+)\n+)|(\n+\s+(?!.+)$)/g, "")).trim(), pt_urls[subjectIndex]);
             subjects.push(subject);
@@ -117,15 +115,14 @@ class MapSubjects {
     mapImportance(subjects) {
         for (let i = 0; i < subjects.length; i++) {
             let current = subjects[i];
-            if (typeof current.key.letter != 'string')
+            if (typeof current.key.letter !== 'string')
                 continue;
             let coincidences = subjects.filter(sub => (current.key.number == sub.key.number));
             if (coincidences.length > 1)
-                subjects[i].key.conciderLetter = true;
+                (subjects[i].key.conciderLetter = true);
         }
         return subjects;
     }
 }
 exports.default = MapSubjects;
-module.exports = MapSubjects;
 //# sourceMappingURL=MapSubjects.js.map

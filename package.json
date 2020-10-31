@@ -4,12 +4,9 @@
   "description": "A lifter for the data from the FCA SUA website.",
   "main": "dist/index.js",
   "scripts": {
-    "start": "tsc && npm run globalMigration",
-    "build": "webpack",
-    "test": "jest",
-    "migrateSubjects": "node scripts/migrateSubjects.js",
-    "migrateActivities": "node scripts/migrateActivities.js",
-    "globalMigration": "node dist/scripts/globalMigration.js"
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "test": "jest"
   },
   "author": "Alejandro Gómez García <alejandro.originx@gmail.com>",
   "license": "ISC",
@@ -18,7 +15,8 @@
     "crawler-request": "^1.2.2",
     "mongodb": "^3.5.9",
     "pdf-parse": "^1.1.1",
-    "request-promise": "^4.2.5"
+    "request-promise": "^4.2.5",
+    "stdio": "^2.1.1"
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.21",

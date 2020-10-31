@@ -15,52 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const converters_1 = require("../helpers/converters");
 const Scraper_1 = __importDefault(require("./Scraper"));
 const Modules_1 = __importDefault(require("../entities/groupers/Modules"));
-class Line {
-    constructor(line) {
-        /**
-         * get just the numbers of a line of thext.
-         * @param {String} line - the line of text where the numbers will be
-         * extracted.
-         * @returns {String} the first number founded.
-         */
-        this.getNumber = () => this.getElement(/[0-9]+/g);
-        this.line = line;
-    }
-    /**
-     *
-     * @param {string} line
-     * @param {RegExp} matcher
-     * @returns {String} the first element that matches with the matcher RegExp
-     */
-    getElement(matcher) {
-        if (!this.line)
-            return '';
-        let result = this.line.match(matcher);
-        return result ? result[0] : '';
-    }
-    /**
-     *
-     * @param {String} line
-     * @returns {Boolean} true if the line is '' or null or undefined or does not
-     * contain anything but spaces.
-     */
-    isEmpty() {
-        return !this.line ||
-            this.line.replace(/\s+/g, '').length === 0;
-    }
-    /**
-     * creates a new string with just letters.
-     * @param {String} line
-     * @returns {String} a line with just alfabetic characters (a-zA-Z)
-     */
-    getText() {
-        if (!this.line)
-            return '';
-        let result = this.line.toLowerCase();
-        result = result.replace(/[\s.;:,?%0-9]+/g, '');
-        return result;
-    }
-}
+const Line_1 = __importDefault(require("./Line"));
 class MapActivities {
     /**
      *
@@ -86,8 +41,7 @@ class MapActivities {
             let fileContent = yield Scraper_1.default.scrapPDF(this.pdfURL);
             let modules = this.getModules(fileContent.text);
             let modulesAndActivities = this.getActivities(modules);
-            let modulesContainer = new Modules_1.default(this.subjectID, modulesAndActivities);
-            return modulesContainer;
+            return new Modules_1.default(this.subjectID, modulesAndActivities);
         });
     }
     /**
@@ -98,9 +52,8 @@ class MapActivities {
      * - object.text: String - the segmented text for each module.
      */
     getModules(content) {
-        const lines = content.split('\n').map(l => new Line(l));
-        let modules = this.getElements(lines, 'unidad');
-        return modules;
+        const lines = content.split('\n').map(l => new Line_1.default(l));
+        return this.getElements(lines, 'unidad');
     }
     /**
      *
@@ -112,16 +65,14 @@ class MapActivities {
      * - object.actividades: Object[] - the activities for the module.
      */
     getActivities(modules) {
-        let modulesAndActivities = modules.map(unity => {
-            let lines = unity.text.split('\n').map(l => new Line(l));
+        return modules.map(unity => {
+            let lines = unity.text.split('\n').map(l => new Line_1.default(l));
             let activities = this.getElements(lines, 'actividad');
-            let module = {
+            return {
                 unidad: unity.unidad,
                 actividades: activities
             };
-            return module;
         });
-        return modulesAndActivities;
     }
     /**
      * Reads every line of the given text to find the divider. If the divider is
@@ -155,7 +106,13 @@ class MapActivities {
      * @returns {Object[]} ??
      */
     blocker(index, lines, divider) {
-        let result = { block: null, analyzedLines: 0 }, block = { text: '' }, textLines = [], j = index, blank = 0, currentLine, isNotDivider;
+        let result = { block: null, analyzedLines: 0 };
+        let block = { text: '' };
+        let textLines = [];
+        let j = index;
+        let blank = 0;
+        let currentLine;
+        let isNotDivider;
         block[divider] =
             lines[j].getNumber() ||
                 lines[j + 1].getNumber() ||
@@ -168,7 +125,7 @@ class MapActivities {
             j++;
             result.analyzedLines++;
             currentLine = lines[j];
-            isNotDivider = currentLine.getText() !== divider;
+            isNotDivider = (currentLine === null || currentLine === void 0 ? void 0 : currentLine.getText()) !== divider;
         } while (isNotDivider && blank < 10 && j < lines.length);
         block.text = converters_1.arrayToText(textLines);
         result.block = block;
@@ -176,7 +133,6 @@ class MapActivities {
     }
 }
 exports.default = MapActivities;
-module.exports = MapActivities;
 //FAST TEST
 // (async function main(){
 //     let url = 'http://fcaenlinea1.unam.mx/planes_trabajo/deliver.php?f=asesor/upload/1353_TODOS.pdf';
