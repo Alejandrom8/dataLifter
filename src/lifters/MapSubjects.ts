@@ -38,7 +38,7 @@ export default class MapSubjects {
           result.errors = err
         }
 
-        return result;
+        return result
     }
 
     /**

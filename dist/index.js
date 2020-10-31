@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const stdio_1 = require("stdio");
 const semesterMigration_1 = __importDefault(require("./scripts/semesterMigration"));
 const truncateSemester_1 = __importDefault(require("./scripts/truncateSemester"));
-const options = ['semester migration', 'truncate semester', 'exit'];
+const options = ['semester migration', 'truncate semester', 'update semester', 'exit'];
 (function main() {
     return __awaiter(this, void 0, void 0, function* () {
         let selectedoption;
@@ -31,6 +31,10 @@ const options = ['semester migration', 'truncate semester', 'exit'];
                     yield performTruncateSemester();
                     yield stdio_1.ask('\npress any key to proceed');
                     break;
+                case 3:
+                    yield performSemesterUpdate();
+                    yield stdio_1.ask('\npress any key to proceed');
+                    break;
                 case options.length:
                     break;
                 default:
@@ -38,8 +42,7 @@ const options = ['semester migration', 'truncate semester', 'exit'];
                     break;
             }
         } while (selectedoption !== options.length);
-        console.log('Program finished...');
-        return Promise.resolve();
+        return console.log('Program finished...');
     });
 })();
 /**
@@ -56,22 +59,28 @@ function askOption() {
 function semesterIsValid(semester) {
     return !(!semester || semester > 9 || semester < 1);
 }
-function performSemesterMigration() {
+function askSemester(message) {
     return __awaiter(this, void 0, void 0, function* () {
-        let selectedSemester = parseInt(yield stdio_1.ask('Which semester do you want to migrate? '));
+        let selectedSemester = parseInt(yield stdio_1.ask(message));
         while (!semesterIsValid(selectedSemester)) {
             selectedSemester = parseInt(yield stdio_1.ask('invalid semester, select other: '));
         }
-        yield semesterMigration_1.default(selectedSemester);
+        return selectedSemester;
+    });
+}
+function performSemesterMigration() {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield semesterMigration_1.default(yield askSemester('Which semester do you want to migrate?'));
     });
 }
 function performTruncateSemester() {
     return __awaiter(this, void 0, void 0, function* () {
-        let selectedSemester = parseInt(yield stdio_1.ask('Which semester do you want to delete? '));
-        while (!semesterIsValid(selectedSemester)) {
-            selectedSemester = parseInt(yield stdio_1.ask('invalid semester, select other: '));
-        }
-        yield truncateSemester_1.default(selectedSemester);
+        yield truncateSemester_1.default(yield askSemester('Which semester do you want to delete?'));
+    });
+}
+function performSemesterUpdate() {
+    return __awaiter(this, void 0, void 0, function* () {
+        return;
     });
 }
 //# sourceMappingURL=index.js.map

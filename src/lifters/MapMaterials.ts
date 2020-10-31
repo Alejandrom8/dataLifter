@@ -1,9 +1,9 @@
-import $ from 'cheerio';
-import Material from '../entities/Material';
-import Scraper from './Scraper';
-import config from '../config.json';
-import { sortSubjects } from '../normalizers/sorters';
-import {ServiceResult} from '../types';
+import $ from 'cheerio'
+import Material from '../entities/Material'
+import Scraper from './Scraper'
+import config from '../config.json'
+import { sortSubjects } from '../normalizers/sorters'
+import {ServiceResult} from '../types'
 
 /**
  * 	MapMaterials - an object that gets the URL's of the 'apuntes' and 
@@ -41,10 +41,10 @@ export default class MapMaterials {
 			result.data = this.processHTML(pageHTML)
 			result.success = true
 		} catch (err) {
-			result.errors = err;
+			result.errors = err
 		}
 
-		return result;
+		return result
 	}
 
 	/**
@@ -54,11 +54,11 @@ export default class MapMaterials {
 	 * @returns {Material[]} an array with the materials extracted from the HTML.
 	 */
 	public processHTML (html: string): Material[] {
-		//gettin the 'claves'. patron: center-left-center-center. [clave, nombre, apunte, actividades];
+		//gettin the 'claves'. patron: center-left-center-center. [clave, nombre, apunte, actividades]
 		const generalSelector = `table.tablaamarilla > tbody tr >`
 		const type_1 = `${generalSelector} td.tablaamarilla[valign="middle"][bgcolor="#E6E6E6"]`
 		const type_2 = `${generalSelector} td.estilos[valign="middle"][bgcolor="#E6E6E6"]`
-		const selector = `${type_1}, ${type_2}`;
+		const selector = `${type_1}, ${type_2}`
 
 		let stringElements = this.getElementsFromHTML(selector, html)
 		let subjectMaterials = this.groupMaterials(stringElements)
@@ -156,7 +156,7 @@ export default class MapMaterials {
 			actividadesURL = subjects[i + 3]
 
 			material = new Material(clave, apunteURL, actividadesURL)
-			sorted.push(material);
+			sorted.push(material)
 		}
 
 		return sorted
@@ -175,20 +175,20 @@ export default class MapMaterials {
 		})
 		const subjectIsChecked = id => generalRoundSubjectsChecked.indexOf(id)
 		const tagCoincidences = coincidences => (
-			coincidences.map((c, index) => {
+			coincidences.map((c, index: number) => {
 				c.key.letter = additionalIndexes[index]
 				return c
 			})
 		)
   
-        for (let i = 0; i < mt.length; i++) {
+    for (let i = 0; i < mt.length; i++) {
 			//searching in all the array the keys that are repeated
-          	let coincidences = getCoincidences(i);
+						let coincidences = getCoincidences(i)
 			if (coincidences.length < 1 || subjectIsChecked(withoutModifications[i].key.number)) {
 				checked = []
 				continue
 			}
-  
+	
 			//ISSUE - habrá problemas cuando admimistración e informática tengan
 			//una matería en común pero contaduría no. en tal caso, quedaría así:
 			//1151a (administración) 1151c (informática)...
@@ -197,8 +197,8 @@ export default class MapMaterials {
 
 			checked = []
 			generalRoundSubjectsChecked.push(withoutModifications[i].key)
-        }
+		}
   
-        return mt
-    }
+  	return mt
+  }
 }

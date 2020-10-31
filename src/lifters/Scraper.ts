@@ -23,7 +23,7 @@ export default class Scraper {
 		})
 		if(!result) throw 'can not get the content of the specified url'
 		return result
-    }
+  }
 
 	/**
 	 * 
@@ -54,20 +54,20 @@ export default class Scraper {
 	* @returns {Array} - an array with the selected and filtered elements from 
 	* the html.
 	*/
-    static getElementsFromHTML({
+  static getElementsFromHTML({
 		cssSelector,
 		html,
 		filter,
 		steps = { init: 0, size: 1 }
 	}: HTMLScrapConfig): string[] {
-        let elements = $(cssSelector, html)
-        let elementsFiltered = []
+		let elements = $(cssSelector, html)
+		let elementsFiltered = []
 
-        for (let i = steps.init; i < Object.keys(elements).length; i += steps.size) {
-            if (typeof elements[i] == 'undefined') continue
-            elementsFiltered.push(filter(elements[i]))
-        }
+		for (let i = steps.init; i < Object.keys(elements).length; i += steps.size) {
+				if (typeof elements[i] == 'undefined') continue
+				elementsFiltered.push(filter(elements[i]))
+		}
 
-        return elementsFiltered
-    }
+		return elementsFiltered
+  }
 }
