@@ -70,11 +70,9 @@ function getAllReferences(values, collectionName, { identifier }) {
 }
 function getIds(collectionName, { identifier, idValue }) {
     return __awaiter(this, void 0, void 0, function* () {
-        let client;
-        let collection;
         let querier = { [identifier]: idValue };
         try {
-            [collection, client] = yield DataBase_1.default.getCollection(collectionName);
+            const collection = DataBase_1.default.getCollection(collectionName);
             let query = yield new Promise((resolve, reject) => {
                 collection.find(querier).toArray((error, data) => {
                     if (error)
@@ -90,18 +88,14 @@ function getIds(collectionName, { identifier, idValue }) {
         catch (error) {
             console.log(error);
         }
-        finally {
-            client.close();
-        }
     });
 }
 function deleteAllReferences() {
     return __awaiter(this, void 0, void 0, function* () {
         let { subjectQuery, moduleQuery, activityQuery } = prepareQueries(RESULTS);
-        let client;
-        let collection;
         try {
-            [collection, client] = yield DataBase_1.default.getCollection('activity');
+            const client = DataBase_1.default.getConnection();
+            const collection = yield DataBase_1.default.getCollection('activity');
             yield collection.deleteMany({ $or: activityQuery });
             yield client
                 .db(config_json_1.default.database.mongodb.db)
@@ -114,9 +108,6 @@ function deleteAllReferences() {
         }
         catch (error) {
             console.log(error);
-        }
-        finally {
-            client.close();
         }
     });
 }

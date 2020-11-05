@@ -27,21 +27,15 @@ class MigrateSubjects {
     migrate() {
         return __awaiter(this, void 0, void 0, function* () {
             let result = { success: false };
-            let collection;
-            let client;
             try {
-                [collection, client] = yield DataBase_1.default.getCollection('subject');
-                let insert = yield collection.insertMany(this.subjects);
+                const collection = DataBase_1.default.getCollection('subject');
+                const insert = yield collection.insertMany(this.subjects);
                 if (!insert.result.ok)
                     throw 'No se logro subir correctamente las asignaturas';
                 result.success = true;
             }
             catch (error) {
-                console.log(error);
                 result.errors = error;
-            }
-            finally {
-                client.close();
             }
             return result;
         });

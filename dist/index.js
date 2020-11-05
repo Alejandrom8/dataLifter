@@ -15,33 +15,40 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const stdio_1 = require("stdio");
 const semesterMigration_1 = __importDefault(require("./scripts/semesterMigration"));
 const truncateSemester_1 = __importDefault(require("./scripts/truncateSemester"));
+const DataBase_1 = __importDefault(require("./DataBase"));
 const options = ['semester migration', 'truncate semester', 'update semester', 'exit'];
 (function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        let selectedoption;
-        do {
-            process.stdout.write('\x1Bc');
-            selectedoption = yield askOption();
-            switch (selectedoption) {
-                case 1:
-                    yield performSemesterMigration();
-                    yield stdio_1.ask('\npress any key to proceed');
-                    break;
-                case 2:
-                    yield performTruncateSemester();
-                    yield stdio_1.ask('\npress any key to proceed');
-                    break;
-                case 3:
-                    yield performSemesterUpdate();
-                    yield stdio_1.ask('\npress any key to proceed');
-                    break;
-                case options.length:
-                    break;
-                default:
-                    console.log('Incorrect option');
-                    break;
-            }
-        } while (selectedoption !== options.length);
+        try {
+            yield DataBase_1.default.initDb();
+            let selectedoption;
+            do {
+                process.stdout.write('\x1Bc');
+                selectedoption = yield askOption();
+                switch (selectedoption) {
+                    case 1:
+                        yield performSemesterMigration();
+                        yield stdio_1.ask('\npress any key to proceed');
+                        break;
+                    case 2:
+                        yield performTruncateSemester();
+                        yield stdio_1.ask('\npress any key to proceed');
+                        break;
+                    case 3:
+                        yield performSemesterUpdate();
+                        yield stdio_1.ask('\npress any key to proceed');
+                        break;
+                    case options.length:
+                        break;
+                    default:
+                        console.log('Incorrect option');
+                        break;
+                }
+            } while (selectedoption !== options.length);
+        }
+        catch (error) {
+            console.error(error);
+        }
         return console.log('Program finished...');
     });
 })();

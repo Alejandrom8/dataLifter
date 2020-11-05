@@ -135,18 +135,18 @@ class MapActivities {
 exports.default = MapActivities;
 //FAST TEST
 // (async function main(){
-//     let url = 'http://fcaenlinea1.unam.mx/planes_trabajo/deliver.php?f=asesor/upload/1353_TODOS.pdf';
-//     console.log(`Getting materials from: ${url}`);
-//     let time = Date.now();
-//     let mapper = new MapActivities(3, '1353', url);
-//     let result = await mapper.formGroups();
-//     console.log(`RESOLVED IN ${Date.now() - time}ms`);
-//     // console.log(result);
+//     let url = 'http://fcaenlinea1.unam.mx/planes_trabajo/deliver.php?f=asesor/upload/1353_TODOS.pdf'
+//     console.log(`Getting materials from: ${url}`)
+//     let time = Date.now()
+//     let mapper = new MapActivities(3, '1353', url)
+//     let result = await mapper.formGroups()
+//     console.log(`RESOLVED IN ${Date.now() - time}ms`)
+//     // console.log(result)
 //     for(let uni of result.modules){
-//         console.log(uni);
+//         console.log(uni)
 //         // for(let act of uni.actividades){
-//         //     console.log(act);
+//         //     console.log(act)
 //         // }
 //     }
-// })();
+// })()
 //# sourceMappingURL=MapModules.js.map

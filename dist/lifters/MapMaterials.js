@@ -59,7 +59,7 @@ class MapMaterials {
      * @returns {Material[]} an array with the materials extracted from the HTML.
      */
     processHTML(html) {
-        //gettin the 'claves'. patron: center-left-center-center. [clave, nombre, apunte, actividades];
+        //gettin the 'claves'. patron: center-left-center-center. [clave, nombre, apunte, actividades]
         const generalSelector = `table.tablaamarilla > tbody tr >`;
         const type_1 = `${generalSelector} td.tablaamarilla[valign="middle"][bgcolor="#E6E6E6"]`;
         const type_2 = `${generalSelector} td.estilos[valign="middle"][bgcolor="#E6E6E6"]`;

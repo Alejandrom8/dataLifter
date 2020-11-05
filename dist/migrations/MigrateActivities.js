@@ -19,11 +19,9 @@ class MigrateActivities {
     }
     migrate() {
         return __awaiter(this, void 0, void 0, function* () {
-            let client;
-            let collection;
             let result = { success: false };
             try {
-                [collection, client] = yield DataBase_1.default.getCollection('activity');
+                let collection = DataBase_1.default.getCollection('activity');
                 let insert = yield collection.insertMany(this.activities);
                 if (!insert.result.ok)
                     throw 'No se logro insertar el dato';
@@ -31,10 +29,6 @@ class MigrateActivities {
             }
             catch (error) {
                 result.errors = error;
-                console.log(error);
-            }
-            finally {
-                client.close();
             }
             return result;
         });

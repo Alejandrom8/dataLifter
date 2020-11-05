@@ -4,7 +4,6 @@ import config from '../config.json'
 import Subject from '../entities/Subject'
 import Module from '../entities/Module'
 import Activity from '../entities/Activity'
-import { Collection, MongoClient } from 'mongodb'
 
 interface RESULTS {
     subject: Subject[]
@@ -89,13 +88,10 @@ async function getIds (
     collectionName: string, 
     { identifier, idValue }
 ): Promise<string[]> {
-    let client: MongoClient
-    let collection: Collection
     let querier = { [identifier]: idValue }
 
     try {
-        [collection, client] = await DataBase.getCollection(collectionName)
-
+        const collection = DataBase.getCollection(collectionName)
         let query: string[] = await new Promise( (resolve, reject) => {
             collection.find(querier).toArray((error, data) => {
                 if(error) reject(error)
@@ -111,8 +107,6 @@ async function getIds (
         return query
     } catch (error) {
         console.log(error)
-    } finally {
-        client.close()
     }
 }
 
@@ -122,11 +116,10 @@ async function deleteAllReferences () {
         moduleQuery, 
         activityQuery 
     } = prepareQueries(RESULTS)
-    let client: MongoClient
-    let collection: Collection
 
     try {
-        [collection, client] = await DataBase.getCollection('activity')
+        const client = DataBase.getConnection()
+        const collection = await DataBase.getCollection('activity')
         await collection.deleteMany({ $or: activityQuery })
         await client
                 .db(config.database.mongodb.db)
@@ -138,8 +131,6 @@ async function deleteAllReferences () {
                 .deleteMany({ $or: subjectQuery })
     } catch (error) {
         console.log(error)
-    } finally {
-        client.close()
     }
 }
 

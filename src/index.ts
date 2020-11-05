@@ -2,34 +2,41 @@ import { ask } from 'stdio'
 import semesterMigration from './scripts/semesterMigration'
 import truncateSemester from './scripts/truncateSemester'
 
+import Database from './DataBase';
+
 const options = ['semester migration', 'truncate semester', 'update semester', 'exit']
 
 ;(async function main () {
-    let selectedoption: number
+    try {
+        await Database.initDb()
+        let selectedoption: number
 
-    do {
-        process.stdout.write('\x1Bc')
-        selectedoption = await askOption()
-        switch (selectedoption) {
-            case 1:
-                await performSemesterMigration()
-                await ask('\npress any key to proceed')
-                break
-            case 2:
-                await performTruncateSemester()
-                await ask('\npress any key to proceed')
-                break
-            case 3:
-                await performSemesterUpdate()
-                await ask('\npress any key to proceed')
-                break
-            case options.length:
-                break
-            default:
-                console.log('Incorrect option')
-                break
-        }
-    } while (selectedoption !== options.length)
+        do {
+            process.stdout.write('\x1Bc')
+            selectedoption = await askOption()
+            switch (selectedoption) {
+                case 1:
+                    await performSemesterMigration()
+                    await ask('\npress any key to proceed')
+                    break
+                case 2:
+                    await performTruncateSemester()
+                    await ask('\npress any key to proceed')
+                    break
+                case 3:
+                    await performSemesterUpdate()
+                    await ask('\npress any key to proceed')
+                    break
+                case options.length:
+                    break
+                default:
+                    console.log('Incorrect option')
+                    break
+            }
+        } while (selectedoption !== options.length)
+    } catch (error) {
+        console.error(error);
+    }
 
     return console.log('Program finished...')
 })()
