@@ -1,0 +1,1 @@
+to generate docker image: https://nodejs.org/fr/docs/guides/nodejs-docker-webapp/

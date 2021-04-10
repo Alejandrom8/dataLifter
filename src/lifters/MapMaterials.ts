@@ -163,10 +163,10 @@ export default class MapMaterials {
 	}
 
 	private checkSimilarSubjects (mt: Material[]): Material[] {
-        let checked = []
-        const withoutModifications = mt.slice()
-        let generalRoundSubjectsChecked = []
-        let final = []
+    let checked = []
+    const withoutModifications = mt.slice()
+    let generalRoundSubjectsChecked = []
+    let final = []
 		let additionalIndexes = ['a', 'c', 'i']
 
 		const getCoincidences = (i: number) => withoutModifications.filter((sub, index) => {
@@ -183,7 +183,7 @@ export default class MapMaterials {
   
     for (let i = 0; i < mt.length; i++) {
 			//searching in all the array the keys that are repeated
-						let coincidences = getCoincidences(i)
+			let coincidences = getCoincidences(i)
 			if (coincidences.length < 1 || subjectIsChecked(withoutModifications[i].key.number)) {
 				checked = []
 				continue
